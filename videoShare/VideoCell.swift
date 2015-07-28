@@ -9,42 +9,35 @@
 import Foundation
 import UIKit
 
-extension UIButton {
-    @IBInspectable var cornerRadius: CGFloat {
-        get {
-            return layer.cornerRadius
-        }
-        set {
-            layer.cornerRadius = newValue
-            layer.masksToBounds = newValue > 0
-        }
-    }
-}
+//extension UIButton {
+//    @IBInspectable var cornerRadius: CGFloat {
+//        get {
+//            return layer.cornerRadius
+//        }
+//        set {
+//            layer.cornerRadius = newValue
+//            layer.masksToBounds = newValue > 0
+//        }
+//    }
+//}
 
 protocol DisplayVideoProtocol {
     func launchVideo(index: Int)
-    func archiveVideo()
 }
 
-@IBDesignable class VideoCell: UITableViewCell, UITextFieldDelegate {
+class VideoCell: UITableViewCell, UITextFieldDelegate {
     
-    @IBOutlet weak var title: UITextField! {
-
-        didSet {
-            if (title.text != "Untitled") {
-                title.textColor = UIColor(red:0.88, green:0.88, blue:0.88, alpha:1)
-            } else {
-                title.textColor = UIColor(red:0.12, green:0.29, blue:0.41, alpha:1)
-            }
-        }
-    }
+    @IBOutlet weak var title: UITextField! 
     @IBOutlet weak var videoLength: UILabel!
     @IBOutlet weak var cancelText: UIButton!
     @IBOutlet weak var saveText: UIButton!
     @IBOutlet weak var videoBtn: UIButton!
     
     var delegate: DisplayVideoProtocol?
-    var index: Int?
+    var index: Int!
+    var videoModel: VideoModel!
+    var videoIndentifier: String!
+    
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -57,6 +50,12 @@ protocol DisplayVideoProtocol {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        
+        if title.text == "Untitled" {
+            title.textColor = UIColor.lightGrayColor()
+        } else {
+            title.textColor = UIColor.greenColor()
+        }
     }
 
     override func awakeFromNib() {
@@ -68,7 +67,6 @@ protocol DisplayVideoProtocol {
     
     
     @IBAction func videoBtnTapped(sender: AnyObject) {
-        print("video btn pressed. tag #: \(sender.tag)")
         delegate?.launchVideo(sender.tag)
     }
     
@@ -80,13 +78,14 @@ protocol DisplayVideoProtocol {
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
-        if title.text == "" {title.text = "Untitled"}
+
         hiddenBtns(hide: true)
         videoBtn.enabled = true
         title.resignFirstResponder()
+        layoutSubviews()
         
-        self.delegate?.archiveVideo()
-    
+        if let newText = textField.text { videoModel.title = newText }
+        DataManager.sharedInstance.updateModels(index, model: videoModel, identifier: videoIndentifier)
     }
     
     func hiddenBtns(hide hide: Bool) {

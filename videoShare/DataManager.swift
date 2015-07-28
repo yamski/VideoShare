@@ -7,10 +7,13 @@
 //
 
 import Foundation
+import Photos
 
 class DataManager {
     
     var dataFilePath: String?
+    var archivedModelArray:[[String:VideoModel]]?
+    var masterVideoArray: [([String: VideoModel], String, PHAsset)] = []
     
     class var sharedInstance : DataManager {
         struct Static {
@@ -19,12 +22,7 @@ class DataManager {
         return Static.instance
     }
     
-    var videoCollection:[String:VideoModel]? {
-        
-        didSet {
-            
-        }
-    }
+
     
     func checkForDirectory() {
         let filemgr = NSFileManager.defaultManager()
@@ -34,22 +32,69 @@ class DataManager {
         dataFilePath = docsDir.stringByAppendingPathComponent("data.archive")
         
         if filemgr.fileExistsAtPath(dataFilePath!) {
-            videoCollection = NSKeyedUnarchiver.unarchiveObjectWithFile(dataFilePath!) as? [String:VideoModel]
-            print("found models")
+            archivedModelArray = NSKeyedUnarchiver.unarchiveObjectWithFile(dataFilePath!) as? [[String: VideoModel]]
         }
     }
     
     
     func archiveVideo() {
         
-        if let videoCollection = videoCollection {
-            if NSKeyedArchiver.archiveRootObject(videoCollection, toFile: dataFilePath!) {
-                print("Success writing to file!")
-            } else {
-                print("Unable to write to file!")
-            }
+        var tempArray: [[String: VideoModel]] = []
+        
+        for tup in masterVideoArray {
+            tempArray.append(tup.0)
+        }
+        
+        if NSKeyedArchiver.archiveRootObject(tempArray, toFile: dataFilePath!) {
+            print("Success writing to file!")
+        } else {
+            print("Unable to write to file!")
         }
     }
+    
+    func updateModels(index: Int, model: VideoModel, identifier: String) {
+        var tempTuple = masterVideoArray[index]
+        var tempDict = tempTuple.0
+        tempDict[identifier] = model
+        tempTuple.0 = tempDict
+        masterVideoArray.insert(tempTuple, atIndex: index)
+        
+        archiveVideo()
+    }
+    
+    func fetchResults(){
+        
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        let results = PHAsset.fetchAssetsWithMediaType(PHAssetMediaType.Video, options: fetchOptions)
+        
+        var tempArray: [([String: VideoModel], String, PHAsset)] = []
+        
+        results.enumerateObjectsUsingBlock({ (asset, index, stop ) -> Void in
+            
+            let videoAsset = VideoModel(asset: asset as! PHAsset, duration: asset.duration)
+            
+            // build dictionary with key of the local identifier
+            var videoDict = [videoAsset.identifier: videoAsset]
+            
+            if let archivedData = self.archivedModelArray {
+            
+                for dict in archivedData {
+                    for (key,value) in dict {
+                        
+                        if key == videoAsset.identifier {
+                            videoDict[key] = value
+                        }
+                    }
+                }
+            }
+            
+            let tuple = (videoDict, videoAsset.identifier, asset as! PHAsset)
+            tempArray.append(tuple)
+            self.masterVideoArray = tempArray
+        })
+    }
+    
 
 }
 
