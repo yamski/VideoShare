@@ -23,6 +23,7 @@ extension UIButton {
 
 protocol DisplayVideoProtocol {
     func launchVideo(index: Int)
+    func archiveVideo()
 }
 
 @IBDesignable class VideoCell: UITableViewCell, UITextFieldDelegate {
@@ -83,6 +84,9 @@ protocol DisplayVideoProtocol {
         hiddenBtns(hide: true)
         videoBtn.enabled = true
         title.resignFirstResponder()
+        
+        self.delegate?.archiveVideo()
+    
     }
     
     func hiddenBtns(hide hide: Bool) {

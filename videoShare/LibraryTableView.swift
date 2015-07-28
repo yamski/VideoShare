@@ -16,17 +16,16 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     @IBOutlet weak var tableView: UITableView!
     
     var videoResults: PHFetchResult?
-    var assetModels = [VideoModel]()
-    var assets: [PHAsset] = []
-    
-    var videoDict = [String: VideoModel]()
-    
+//    var assetModels = [VideoModel]()
     var imageManager: PHImageManager?
     var player: AVPlayer?
     var dataFilePath: String?
     
-  
+//    var archiveDict:[String:VideoModel]?
+    var masterVideoArray: [([String: VideoModel], String, PHAsset)] = []
+    var archivedModelArray:[[String:VideoModel]]?
     
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -34,43 +33,37 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         tableView.allowsSelection = false
         imageManager = PHImageManager.defaultManager()
         
-        videoResults = PHAsset.fetchAssetsWithMediaType(PHAssetMediaType.Video, options: nil)
-        
-        videoResults?.enumerateObjectsUsingBlock({ (asset, index, stop ) -> Void in
-            
-            self.assets.append(asset as! PHAsset)
-            
-            let videoAsset = VideoModel(asset: asset as! PHAsset, duration: asset.duration)
-            
-//            self.assetModels.append(videoAsset)
-            
-            self.mergeVideoCollection(videoAsset)
-            
-            
-        })
+        fetchResults()
         
         
-      
     }
     
 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-       return assetModels.count
+       return masterVideoArray.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
+        
+        print("cell for row ran")
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! VideoCell
         
-        let asset = assetModels[indexPath.row]
+        let tempTuple = masterVideoArray[indexPath.row]
+        let tempDict = tempTuple.0
+        
+        if let videoModel = tempDict[tempTuple.1]{
+            cell.videoLength.text = videoModel.durationString
+            cell.title.text = videoModel.title
+        }
+        
         cell.videoBtn.tag = indexPath.row
         cell.delegate = self
-        cell.videoLength.text = asset.durationString
-        cell.title.text = asset.title
         
-        imageManager!.requestImageForAsset(assets[indexPath.row], targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
+        imageManager!.requestImageForAsset(tempTuple.2, targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
        
             if let cell = tableView.cellForRowAtIndexPath(indexPath) as? VideoCell {
 
@@ -96,9 +89,9 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     func launchVideo(index: Int) {
         
-        let videoObject = assetModels[index]
+        let videoObject = masterVideoArray[index]
         
-        let result = PHAsset.fetchAssetsWithLocalIdentifiers([videoObject.identifier], options: nil)
+        let result = PHAsset.fetchAssetsWithLocalIdentifiers([videoObject.1], options: nil)
         
         result.enumerateObjectsUsingBlock { (asset, index, stop) -> Void in
             
@@ -123,7 +116,7 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         dataFilePath = docsDir.stringByAppendingPathComponent("data.archive")
         
         if filemgr.fileExistsAtPath(dataFilePath!) {
-            assetModels = NSKeyedUnarchiver.unarchiveObjectWithFile(dataFilePath!) as! [VideoModel]
+            archivedModelArray = NSKeyedUnarchiver.unarchiveObjectWithFile(dataFilePath!) as? [[String: VideoModel]]
             print("found models")
         }
     }
@@ -131,25 +124,59 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     func archiveVideo() {
         
-        if NSKeyedArchiver.archiveRootObject(assetModels, toFile: dataFilePath!) {
+        var tempArray: [[String: VideoModel]] = []
+        
+        for tup in masterVideoArray {
+            tempArray.append(tup.0)
+        }
+        
+        if NSKeyedArchiver.archiveRootObject(tempArray, toFile: dataFilePath!) {
             print("Success writing to file!")
         } else {
             print("Unable to write to file!")
         }
     }
     
-    var archiveDict:[String:VideoModel]?
-    func mergeVideoCollection(video: VideoModel) {
+    
+    func fetchResults(){
         
-        videoDict[video.identifier] = video
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        let results = PHAsset.fetchAssetsWithMediaType(PHAssetMediaType.Video, options: fetchOptions)
         
-        for (key,value) in archiveDict! {
-            if key == video.identifier {
-                videoDict[key] = value
+        var tempArray: [([String: VideoModel], String, PHAsset)] = []
+        
+        results.enumerateObjectsUsingBlock({ (asset, index, stop ) -> Void in
+            
+            let videoAsset = VideoModel(asset: asset as! PHAsset, duration: asset.duration)
+            
+            // build dictionary with key of the local identifier
+            var videoDict = [videoAsset.identifier: videoAsset]
+            
+            if let archivedData = self.archivedModelArray {
+                print("archived models exists")
+                for dict in archivedData {
+                    for (key,value) in dict {
+                        print("enumerating")
+                        if key == videoAsset.identifier {
+                            print("found matching key in archive")
+                            videoDict[key] = value
+                        }
+                    }
+                }
             }
-        }
-        
-    //test
+            
+            let tuple = (videoDict, videoAsset.identifier, asset as! PHAsset)
+            tempArray.append(tuple)
+            self.masterVideoArray = tempArray
+            
+            print("done syncing data")
+            
+        })
+
     }
+    
+
+    
 
 }
