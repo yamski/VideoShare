@@ -39,10 +39,18 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     weak var tableView: UITableView!
     var indexPath: NSIndexPath!
     
+    var editingCell: Bool! {
+        didSet {
+            tableView.allowsSelection = editingCell
+            tableView.scrollEnabled = editingCell
+            cancelText.hidden = editingCell
+            saveText.hidden = editingCell
+            videoBtn.enabled = editingCell
+        }
+    }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -56,14 +64,14 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
             title.alpha = 1.0
             title.textColor = UIColor(red:0.12, green:0.29, blue:0.41, alpha:1)
         }
-
     }
 
     override func awakeFromNib() {
         super.awakeFromNib()
         
         self.title.delegate = self
-        hiddenBtns(hide: true)
+        cancelText.hidden = true
+        saveText.hidden = true
     }
     
     
@@ -85,20 +93,17 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
             tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: UITableViewScrollPosition.Middle, animated: true)
         }
         print("y: \(yPoint), mid point: \(screenMidHeight)")
-        
-        videoBtn.enabled = false
-        title.text = ""
-        hiddenBtns(hide: false)
-        tableView.scrollEnabled = false
+
         return true
     }
     
+    func textFieldDidBeginEditing(textField: UITextField) {
+        editingCell = false
+    }
+    
     func textFieldDidEndEditing(textField: UITextField) {
-
-        hiddenBtns(hide: true)
-        videoBtn.enabled = true
         title.resignFirstResponder()
-        tableView.scrollEnabled = true
+        editingCell = true
         layoutSubviews()
         
         if let newText = textField.text { videoModel.title = newText }
@@ -109,11 +114,7 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
-    
-    func hiddenBtns(hide hide: Bool) {
-        cancelText.hidden = hide
-        saveText.hidden = hide
-    }
+
     
 
 }
