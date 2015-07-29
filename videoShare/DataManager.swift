@@ -57,7 +57,9 @@ class DataManager {
         var tempDict = tempTuple.0
         tempDict[identifier] = model
         tempTuple.0 = tempDict
-        masterVideoArray.insert(tempTuple, atIndex: index)
+        masterVideoArray[index] = tempTuple
+        
+        print("master count: \(masterVideoArray.count)")
         
         archiveVideo()
     }

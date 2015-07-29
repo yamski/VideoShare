@@ -9,19 +9,19 @@
 import Foundation
 import UIKit
 
-//extension UIButton {
-//    @IBInspectable var cornerRadius: CGFloat {
-//        get {
-//            return layer.cornerRadius
-//        }
-//        set {
-//            layer.cornerRadius = newValue
-//            layer.masksToBounds = newValue > 0
-//        }
-//    }
-//}
+extension UIButton {
+    @IBInspectable var cornerRadius: CGFloat {
+        get {
+            return layer.cornerRadius
+        }
+        set {
+            layer.cornerRadius = newValue
+            layer.masksToBounds = newValue > 0
+        }
+    }
+}
 
-protocol DisplayVideoProtocol {
+protocol VideoCellProtocol {
     func launchVideo(index: Int)
 }
 
@@ -33,10 +33,11 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var saveText: UIButton!
     @IBOutlet weak var videoBtn: UIButton!
     
-    var delegate: DisplayVideoProtocol?
-    var index: Int!
+    var delegate: VideoCellProtocol?
     var videoModel: VideoModel!
     var videoIndentifier: String!
+    weak var tableView: UITableView!
+    var indexPath: NSIndexPath!
     
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
@@ -51,11 +52,11 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if title.text == "Untitled" {
-            title.textColor = UIColor.lightGrayColor()
-        } else {
-            title.textColor = UIColor.greenColor()
+        if title.text != nil {
+            title.alpha = 1.0
+            title.textColor = UIColor(red:0.12, green:0.29, blue:0.41, alpha:1)
         }
+
     }
 
     override func awakeFromNib() {
@@ -71,9 +72,24 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     }
     
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
+        
+        // y position of cell
+        let rectInTableView = tableView.rectForRowAtIndexPath(indexPath)
+        let rect = tableView.convertRect(rectInTableView, fromView: tableView.superview!.superview)
+        let yPoint = rect.origin.y
+        
+        // mid point of screen, accounting for orientation
+        let screenMidHeight = tableView.superview!.frame.midY
+       
+        if (yPoint >= screenMidHeight) {
+            tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: UITableViewScrollPosition.Middle, animated: true)
+        }
+        print("y: \(yPoint), mid point: \(screenMidHeight)")
+        
         videoBtn.enabled = false
         title.text = ""
         hiddenBtns(hide: false)
+        tableView.scrollEnabled = false
         return true
     }
     
@@ -82,10 +98,16 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         hiddenBtns(hide: true)
         videoBtn.enabled = true
         title.resignFirstResponder()
+        tableView.scrollEnabled = true
         layoutSubviews()
         
         if let newText = textField.text { videoModel.title = newText }
-        DataManager.sharedInstance.updateModels(index, model: videoModel, identifier: videoIndentifier)
+        DataManager.sharedInstance.updateModels(indexPath.row, model: videoModel, identifier: videoIndentifier)
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
     
     func hiddenBtns(hide hide: Bool) {

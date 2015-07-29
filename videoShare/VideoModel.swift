@@ -14,7 +14,7 @@ protocol Video {
     var identifier: String { get }
     var duration: NSTimeInterval { get }
     var durationString: String! { get }
-    var title: String { get set }
+    var title: String? { get set }
     var tags: [String] { get set }
 }
 
@@ -24,14 +24,14 @@ class VideoModel: NSObject, NSCoding, Video {
     let identifier: String
     var duration: NSTimeInterval
     var durationString: String!
-    var title: String
+    var title: String?
     var tags: [String]
 
     init(asset:PHAsset, duration: NSTimeInterval){
 //        self.asset = asset
         self.identifier = asset.localIdentifier
         self.duration = duration
-        self.title = "Untitled"
+//        self.title = "Untitled"
         self.tags = []
         super.init()
         self.durationString = stringFromTimeInterval(duration) as String
@@ -42,7 +42,7 @@ class VideoModel: NSObject, NSCoding, Video {
         self.identifier = decoder.decodeObjectForKey("indentifier") as! String
         self.duration = decoder.decodeDoubleForKey("duration")
         self.durationString = decoder.decodeObjectForKey("durationString") as! String
-        self.title = decoder.decodeObjectForKey("title") as! String
+        self.title = decoder.decodeObjectForKey("title") as? String
         self.tags = decoder.decodeObjectForKey("tags") as! [String]
     }
     

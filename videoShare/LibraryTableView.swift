@@ -11,7 +11,7 @@ import UIKit
 import Photos
 import AVKit
 
-class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, DisplayVideoProtocol {
+class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, VideoCellProtocol {
     
     @IBOutlet weak var tableView: UITableView!
     var imageManager = PHImageManager.defaultManager()
@@ -29,9 +29,10 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-
+        print("cell count: \(DataManager.sharedInstance.masterVideoArray.count)")
        return DataManager.sharedInstance.masterVideoArray.count
     }
+    
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
@@ -46,11 +47,12 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
             cell.videoIndentifier = videoModel.identifier
             cell.videoLength.text = videoModel.durationString
             cell.title.text = videoModel.title
-            cell.index = indexPath.row
+            cell.indexPath = indexPath
         }
         
-        cell.videoBtn.tag = indexPath.row
         cell.delegate = self
+        cell.videoBtn.tag = indexPath.row
+        cell.tableView = tableView
         
         imageManager.requestImageForAsset(tempTuple.2, targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
        
@@ -58,6 +60,7 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
                 cell.videoBtn.setBackgroundImage(result, forState: UIControlState.Normal)
             }
         }
+    
         return cell
     }
     
@@ -94,6 +97,7 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
             }
         }
     }
+    
     
 
 }
