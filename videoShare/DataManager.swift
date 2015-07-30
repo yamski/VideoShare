@@ -14,6 +14,16 @@ class DataManager {
     var dataFilePath: String?
     var archivedModelArray:[[String:VideoModel]]?
     var masterVideoArray: [([String: VideoModel], String, PHAsset)] = []
+    var filteredArray: [([String: VideoModel], String, PHAsset)] = []
+    
+    var userIsSearching: Bool {
+        get{
+            return  DataManager.sharedInstance.filteredArray.count != 0
+        }
+        set {
+            self.userIsSearching =  DataManager.sharedInstance.filteredArray.count != 0
+        }
+    }
     
     class var sharedInstance : DataManager {
         struct Static {
