@@ -107,6 +107,10 @@ class DataManager {
         })
     }
     
+    func getDataArray() -> [([String: VideoModel], String, PHAsset)] {
+        return userIsSearching ? filteredArray : masterVideoArray
+    }
+    
 
 }
 

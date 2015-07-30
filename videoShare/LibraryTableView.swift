@@ -43,11 +43,7 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if DataManager.sharedInstance.userIsSearching {
-            return  DataManager.sharedInstance.filteredArray.count
-        }
-        return DataManager.sharedInstance.masterVideoArray.count
-    
+        return DataManager.sharedInstance.getDataArray().count
     }
     
     
@@ -55,13 +51,8 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! VideoCell
         
-        var tempTuple : ([String: VideoModel], String, PHAsset)
-        if DataManager.sharedInstance.userIsSearching {
-            tempTuple = DataManager.sharedInstance.filteredArray[indexPath.row]
-        } else {
-            tempTuple = DataManager.sharedInstance.masterVideoArray[indexPath.row]
-        }
-    
+        let dataArray = DataManager.sharedInstance.getDataArray()
+        let tempTuple = dataArray[indexPath.row]
         let tempDict = tempTuple.0
         
         if let videoModel = tempDict[tempTuple.1]{
@@ -100,14 +91,9 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     func launchVideo(index: Int) {
         
-        
-        var videoObject : ([String: VideoModel], String, PHAsset)
-        if DataManager.sharedInstance.userIsSearching {
-            videoObject = DataManager.sharedInstance.filteredArray[index]
-        } else {
-            videoObject = DataManager.sharedInstance.masterVideoArray[index]
-        }
-        
+        let dataArray = DataManager.sharedInstance.getDataArray()
+        let videoObject = dataArray[index]
+
         let result = PHAsset.fetchAssetsWithLocalIdentifiers([videoObject.1], options: nil)
         
         result.enumerateObjectsUsingBlock { (asset, index, stop) -> Void in
@@ -135,16 +121,19 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     @IBAction func cancelSearch(sender: AnyObject) {
         
         self.searchBarPosY.constant = -75
+        
         UIView.animateWithDuration(0.25, animations: { () -> Void in
             self.view.layoutIfNeeded()
             }) { (succeeded) -> Void in
                 self.searchBar.hidden = true
+                DataManager.sharedInstance.filteredArray.removeAll()
+                self.tableView.reloadData()
+                self.searchTextField.resignFirstResponder()
         }
         
     }
     
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
-        
         return true
     }
     
@@ -154,15 +143,12 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
- 
         searchTextField.resignFirstResponder()
         return true
     }
     
-    var typing = 0
     func textFieldDidChange(sender: UITextField) {
-        typing++
-        print(typing)
+
         if let enteredText = sender.text {
             DataManager.sharedInstance.filteredArray = DataManager.sharedInstance.masterVideoArray.filter({
                 let dict = $0.0
@@ -173,7 +159,6 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
             })
             tableView.reloadData()
         }
-        
     }
     
 
