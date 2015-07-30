@@ -13,7 +13,14 @@ import AVKit
 
 class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, VideoCellProtocol {
     
+    @IBOutlet weak var tableViewHeader: UIView!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBtn: UIButton!
+    @IBOutlet weak var tagBtn: UIButton!
+    
+    @IBOutlet weak var searchBar: UIView!
+    
+    @IBOutlet weak var searhBarPosY: NSLayoutConstraint!
     var imageManager = PHImageManager.defaultManager()
     var player: AVPlayer?
 
@@ -24,6 +31,9 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         DataManager.sharedInstance.checkForDirectory()
         DataManager.sharedInstance.fetchResults()
         tableView.allowsSelection = false
+        
+        print(self.searchBar.frame.origin.y)
+        
     }
     
 
@@ -60,10 +70,8 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
                 cell.videoBtn.setBackgroundImage(result, forState: UIControlState.Normal)
             }
         }
-    
         return cell
     }
-    
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
@@ -98,6 +106,21 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         }
     }
     
-    
+    @IBAction func searchBtnTapped(sender: AnyObject) {
+        print("search btn tapped")
+        self.view.layoutIfNeeded()
+        self.searhBarPosY.constant = 0
 
+        UIView.animateWithDuration(0.25, animations: { () -> Void in
+      
+            self.view.layoutIfNeeded()
+            }) { (suceeded) -> Void in
+        print(self.searchBar.frame)
+        }
+    }
+    
+    @IBAction func tagBtnTapped(sender: AnyObject) {
+    }
+
+   
 }

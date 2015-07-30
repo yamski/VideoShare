@@ -46,6 +46,7 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
             cancelText.hidden = editingCell
             saveText.hidden = editingCell
             videoBtn.enabled = editingCell
+            videoLength.hidden = editingCell
         }
     }
     
