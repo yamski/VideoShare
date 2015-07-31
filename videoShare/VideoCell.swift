@@ -41,7 +41,7 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     
     var editingCell: Bool! {
         didSet {
-            tableView.allowsSelection = editingCell
+//            tableView.allowsSelection = editingCell
             tableView.scrollEnabled = editingCell
             cancelText.hidden = editingCell
             saveText.hidden = editingCell
@@ -81,6 +81,8 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     }
     
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
+        
+        print("editing textfield")
         
         // y position of cell
         let rectInTableView = tableView.rectForRowAtIndexPath(indexPath)

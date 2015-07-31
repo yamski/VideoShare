@@ -14,7 +14,11 @@ import AVKit
 class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate,VideoCellProtocol {
     
     @IBOutlet weak var tableViewHeader: UIView!
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var tableView: UITableView! {
+        didSet {
+            tableView.allowsSelection = false
+        }
+    }
     @IBOutlet weak var searchBtn: UIButton!
     @IBOutlet weak var tagBtn: UIButton!
     @IBOutlet weak var searchBar: UIView! {
@@ -51,6 +55,8 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         
         let dataArray = DataManager.sharedInstance.getDataArray()
         let tempTuple = dataArray[indexPath.row]
+        
+        print("printing creation date: \(tempTuple.2.creationDate)")
         let tempDict = tempTuple.0
         
         if let videoModel = tempDict[tempTuple.1] {
@@ -170,6 +176,7 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     @IBAction func tagBtnTapped(sender: AnyObject) {
         print("filtered array \(DataManager.sharedInstance.filteredArray)")
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
 
    

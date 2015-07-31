@@ -4,29 +4,12 @@
 //
 //  Created by JOHN YAM on 3/1/15.
 //  Copyright (c) 2015 John Yam. All rights reserved.
-//
-//
-
-    // AVFoundation is based on the concept of the session. A session is used to control the flow of the data from an input to an output device. generates runtime errors in case something goes wrong.
-
-//  AVCaptureDevice – represents the input device (camera or microphone)
-//  AVCaptureInput – (a concrete subclass of) to configure the ports from the input device (has one or more input ports which are instances of AVCaptureInputPort)
-//  AVCaptureOutput – (a concrete subclass of) to manage the output to a movie file or still image (accepts data from one or more sources, e.g. an AVCaptureMovieFileOutput object accepts both video and audio data)
-//  AVCaptureSession – coordinates the data flow from the input to the output
-//  AVCaptureVideoPreviewLayer – shows the user what a camera is recording
-
-//  AVCaptureConnection – connection between a capture input and a capture output in a capture session. Can be used to enable or disable the flow of data from a given input or to a given output. Also to monitor the average and peak power levels in audio channels.
-
-//    AVCaptureDevice is the interface to the hardware camera. It is used to control the hardware features such as the position of the lens, the exposure, and the flash
 
 import UIKit
 import AVFoundation
 import GLKit
 import CoreMedia
 import AssetsLibrary
-
-
-import MediaPlayer
 
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureFileOutputRecordingDelegate, TopButtonProtocol, MenuProtocol {
     
@@ -37,15 +20,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     var possibleCameraInput: AnyObject?
     
     var previewLayer: PreviewLayerVC?
-    
     var videoOutput: AVCaptureVideoDataOutput?
-    var glContext: EAGLContext?
-    var glView: GLKView?
-    var ciContext: CIContext?
-    var stillCameraOutput: AVCaptureStillImageOutput?
     var movieFileOutput: AVCaptureMovieFileOutput?
     var weAreRecording: Bool = false
-    
     
     var topBar: TopBar!
     var menu: Menu?
@@ -59,23 +36,76 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     
     var showMenu = true
     
-    @IBOutlet weak var recordButton: UIButton!
+    @IBOutlet weak var recordButton: UIButton! {
+        didSet {
+            recordButton.layer.cornerRadius = recordButton.frame.size.width / 2
+        }
+    }
+    
     @IBOutlet weak var libraryBtn: UIButton!
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
-        view.backgroundColor = UIColor.clearColor()
-        
-        setupPreview()
-       
-        recordButton.layer.cornerRadius = recordButton.frame.size.width / 2
-    
+   
         session = AVCaptureSession()
+        setupCameraInputs()
+        addAudio()
+        setupPreview()
+        buildTopBarView()
+
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "orientationChanged:", name: UIDeviceOrientationDidChangeNotification, object: nil)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(false)
+        navigationController?.navigationBarHidden = true
+        session.startRunning()
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(false)
+        session.stopRunning()
+    }
+    
+    func buildTopBarView() {
+        topBar = TopBar()
+        topBar.delegate = self
+        view.addSubview(topBar)
+    }
+    
+    func addAudio() {
+        do {
+            let audioCaptureDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeAudio)
+            
+//            let audioInput = AVCaptureDeviceInput.deviceInputWithDevice(audioCaptureDevice) as AVCaptureDeviceInput
+            let audioInput = try AVCaptureDeviceInput(device: audioCaptureDevice)
+            session.addInput(audioInput)
         
+//            if let hasAudioInput = audioInput { session.addInput(audioInput) }
+        } catch let error as NSError{
+            print(error.description)
+        }
+        session.commitConfiguration()
+    }
+
+    func setupPreview() {
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            print("new session")
+            self.previewLayer = PreviewLayerVC()
+            self.previewLayer!.session = self.session
+            self.previewLayer!.pLayer.frame = self.view.frame
+            self.view.insertSubview(self.previewLayer!.view, atIndex: 0)
+    
+            self.session.startRunning()
+//            self.checkAuthorizition()
+            self.setupCameraOutput()
+        }
+    }
+    
+    func setupCameraInputs() {
         let availableCameraDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
-        
         for device in availableCameraDevices as! [AVCaptureDevice] {
             if device.position == .Back {
                 backCameraDevice = device
@@ -84,14 +114,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
         }
         
-   
         do {
             possibleCameraInput = try AVCaptureDeviceInput(device: backCameraDevice)
-            
             activeCameraDevice = backCameraDevice
-            
         } catch let outError as NSError {
-            
             print(outError.description)
             possibleCameraInput = nil
         }
@@ -101,64 +127,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 self.session.addInput(cameraInput)
             }
         }
-        
-        addAudio()
-        buildTopBarView()
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "orientationChanged:", name: UIDeviceOrientationDidChangeNotification, object: nil)
-        
-    }
-    
-
-    
-    override func viewWillAppear(animated: Bool) {
-        navigationController?.navigationBarHidden = true
-    }
-    
-    func buildTopBarView() {
-        
-        topBar = TopBar()
-        topBar.delegate = self
-        view.addSubview(topBar)
-
-    }
-    
-    func addAudio() {
-        
-       
-        
-        do {
-            let audioCaptureDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeAudio)
-            
-//            let audioInput = AVCaptureDeviceInput.deviceInputWithDevice(audioCaptureDevice) as AVCaptureDeviceInput
-            let audioInput = try AVCaptureDeviceInput(device: audioCaptureDevice)
-            session.addInput(audioInput)
-        
-//            if let hasAudioInput = audioInput { session.addInput(audioInput) }
-            
-            
-        } catch let error as NSError{
-            print(error.description)
-        }
-        
-        
-    
-        session.commitConfiguration()
-    }
-
-    func setupPreview() {
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            self.previewLayer = PreviewLayerVC()
-            self.previewLayer!.session = self.session
-            self.previewLayer!.pLayer.frame = self.view.frame
-            self.view.insertSubview(self.previewLayer!.view, atIndex: 0)
-            
-            self.session.startRunning()
-            
-//            self.checkAuthorizition()
-            self.setupCameraOutput()
-        }
     }
     
     func setupCameraOutput() {
@@ -167,16 +135,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         videoOutput?.setSampleBufferDelegate(self, queue: dispatch_queue_create("sample buffer delegate", DISPATCH_QUEUE_SERIAL))
         
         if session.canAddOutput(self.videoOutput) {
-            
             session.addOutput(self.videoOutput)
             session.startRunning()
-        }
-        
-        // AVCaptureStillImageOutput allows us to capture a still image
-        stillCameraOutput = AVCaptureStillImageOutput()
-        
-        if self.session.canAddOutput(self.stillCameraOutput) {
-            self.session.addOutput(self.stillCameraOutput)
         }
         
         //ADD MOVIE FILE OUTPUT
@@ -193,44 +153,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             session.addOutput(movieFileOutput)
         }
     }
-    
-    
-    func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
-        
-        if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
-            let image = CIImage(CVPixelBuffer: pixelBuffer)
-            
-            if glContext != EAGLContext.currentContext() {
-                EAGLContext.setCurrentContext(glContext)
-            }
-            glView?.bindDrawable()
-            ciContext?.drawImage(image, inRect:image.extent, fromRect: image.extent)
-            glView?.display()
-        }
 
-    }
-    
-
-    
-    
-//    func cameraSetOutputProperties() {
-//        
-//        let captureConnection: AVCaptureConnection = movieFileOutput!.connectionWithMediaType(AVMediaTypeVideo)
-////        //Set frame rate (if requried)
-////        CMTimeShow(captureConnection.videoMinFrameDuration)
-////        CMTimeShow(captureConnection.videoMaxFrameDuration)
-////        
-////        if (captureConnection.supportsVideoMinFrameDuration) {
-////        captureConnection.videoMinFrameDuration = CMTimeMake(1, CAPTURE_FRAMES_PER_SECOND)
-////        }
-////        if (captureConnection.supportsVideoMaxFrameDuration)
-////        CcptureConnection.videoMaxFrameDuration = CMTimeMake(1, CAPTURE_FRAMES_PER_SECOND);
-////        
-////        CMTimeShow(CaptureConnection.videoMinFrameDuration);
-////        CMTimeShow(CaptureConnection.videoMaxFrameDuration);
-//    
-//    }
-    
     
     func checkAuthorizition() {
         
@@ -258,15 +181,12 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         case .Denied, .Restricted:
             
             let alertController = UIAlertController(title: "Default Style", message: "A standard alert.", preferredStyle: .Alert)
-            
             let OKAction = UIAlertAction(title: "OK", style: .Default) { (action) in
             }
             
             alertController.addAction(OKAction)
-            
             self.presentViewController(alertController, animated: true) { }
         }
-        
     }
     
 
@@ -310,25 +230,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             print("START RECORDING")
             weAreRecording = true
             
-            //Create temporary URL to record to
-            
             let outputPath: NSString = "\(NSTemporaryDirectory()) + output.mov"
-            
             let outputURL = NSURL(fileURLWithPath: outputPath as String)
-            
-            let fileManger = NSFileManager.defaultManager()
-            
-//            if(fileManger.fileExistsAtPath(outputPath as String)){
-//                
-//                var error: NSError?
-//                
-//                if (fileManger.removeItemAtPath(outputPath as String) == false) {
-//                    // handle error
-//                    
-//                    print(error)
-//                }
-//                
-//            }
             movieFileOutput?.startRecordingToOutputFileURL(outputURL, recordingDelegate: self)
             
             recordButton.setTitle("STOP", forState: .Normal)
@@ -368,52 +271,20 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         
         let recordedSuccessfully = true;
         
-//        if (error.code != noErr) {
-//            
-//            // A problem occurred: Find out if the recording was successful.
-//            var value = error.userInfo.objectForKey(AVErrorRecordingSuccessfullyFinishedKey)
-//            
-//            if (value) {
-//                RecordedSuccessfully = value.boolValue;
-//            }
-//        }
-        
         if (recordedSuccessfully) {
-        
             print("didFinishRecordingToOutputFileAtURL - success");
             let library = ALAssetsLibrary()
-        
-            
             library.writeVideoAtPathToSavedPhotosAlbum(outputFileURL, completionBlock: nil)
-      
         }
-        
     }
     
-    func saveToDocumentsDirectory() {
-        
-        let destFileName = "output.mov"
-        print("starting to save \(destFileName)")
-        
-//        let paths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-    
-        
-//        DestPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:RECORD_TO_ADD_DIRECTORY];
-//        DestPath = [DestPath stringByAppendingPathComponent:DestFilename];
-//        
-//        NSURL* saveLocationURL = [[NSURL alloc] initFileURLWithPath:DestPath];
-//        [MovieFileOutput startRecordingToOutputFileURL:saveLocationURL recordingDelegate:self];
-    }
-    
-    
+
     func selectCamera() {
         
         session.beginConfiguration()
         
         let currentCameraInput = session.inputs.first as! AVCaptureInput
-        
         let inputs = session.inputs
-        
         for input in inputs {session.removeInput(input as! AVCaptureInput)}
         
         if (currentCameraInput as! AVCaptureDeviceInput).device.position == AVCaptureDevicePosition.Back {
@@ -585,7 +456,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 //            if(device.lockForConfiguration())
             
             do {
-                
                 try device.lockForConfiguration()
                 
                 // Adjust the iso to clamp between minIso and maxIso based on the active format
@@ -610,7 +480,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func adjustTemp(sender: UISlider) {
         
         print("adjust temp", appendNewline: false)
-        
         let tempAndTint = AVCaptureWhiteBalanceTemperatureAndTintValues(temperature: menu!.tempSlider.value, tint: menu!.tintSlider.value)
         setWhiteBalanceGains(activeCameraDevice!.deviceWhiteBalanceGainsForTemperatureAndTintValues(tempAndTint))
     }
@@ -752,13 +621,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     @IBAction func libraryBtnTapped(sender: AnyObject) {
         performSegueWithIdentifier("ToLibrary", sender: self)
-        
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        
-//        let vc = storyboard.instantiateViewControllerWithIdentifier("tableView") as? LibraryTableView
-//        
-// 
-//        presentViewController(vc!, animated: true, completion: nil)
     }
 
     override func shouldAutorotate() -> Bool {
