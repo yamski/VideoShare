@@ -17,7 +17,11 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBtn: UIButton!
     @IBOutlet weak var tagBtn: UIButton!
-    @IBOutlet weak var searchBar: UIView!
+    @IBOutlet weak var searchBar: UIView! {
+        didSet {
+            searchBar.hidden = true
+        }
+    }
     @IBOutlet weak var searchBarPosY: NSLayoutConstraint!
     var imageManager = PHImageManager.defaultManager()
     var player: AVPlayer?
@@ -28,21 +32,15 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         }
     }
 
-   
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         DataManager.sharedInstance.checkForDirectory()
         DataManager.sharedInstance.fetchResults()
-//        tableView.allowsSelection = false
-
     }
     
 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return DataManager.sharedInstance.getDataArray().count
     }
     
@@ -55,7 +53,7 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         let tempTuple = dataArray[indexPath.row]
         let tempDict = tempTuple.0
         
-        if let videoModel = tempDict[tempTuple.1]{
+        if let videoModel = tempDict[tempTuple.1] {
             
             cell.videoModel = videoModel
             cell.videoIndentifier = videoModel.identifier
@@ -115,20 +113,27 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
         searchBar.hidden = false
         searchBarPosY.constant = 0
-        UIView.animateWithDuration(0.25) { self.view.layoutIfNeeded() }
+    
+        UIView.animateWithDuration(0.25, animations: { () -> Void in
+            self.view.layoutIfNeeded()
+            }) { (succeeded) -> Void in
+                self.searchTextField.becomeFirstResponder()
+        }
     }
     
     @IBAction func cancelSearch(sender: AnyObject) {
         
-        self.searchBarPosY.constant = -75
+        searchTextField.text = ""
+        searchTextField.resignFirstResponder()
+        searchBarPosY.constant = -75
+        DataManager.sharedInstance.filteredArray.removeAll()
+        tableView.reloadData()
         
         UIView.animateWithDuration(0.25, animations: { () -> Void in
             self.view.layoutIfNeeded()
             }) { (succeeded) -> Void in
                 self.searchBar.hidden = true
-                DataManager.sharedInstance.filteredArray.removeAll()
-                self.tableView.reloadData()
-                self.searchTextField.resignFirstResponder()
+                
         }
         
     }

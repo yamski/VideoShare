@@ -62,15 +62,14 @@ class DataManager {
         }
     }
     
-    func updateModels(index: Int, model: VideoModel, identifier: String) {
-        var tempTuple = masterVideoArray[index]
-        var tempDict = tempTuple.0
-        tempDict[identifier] = model
-        tempTuple.0 = tempDict
-        masterVideoArray[index] = tempTuple
+    func updateModels(model: VideoModel, identifier: String) {
         
-        print("master count: \(masterVideoArray.count)")
-        
+        for tup in masterVideoArray {
+            var dict = tup.0
+            let key = model.identifier
+            
+            if (dict[key]) == key { dict[key] = model }
+        }
         archiveVideo()
     }
     

@@ -46,7 +46,7 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
             cancelText.hidden = editingCell
             saveText.hidden = editingCell
             videoBtn.enabled = editingCell
-            videoLength.hidden = editingCell
+            videoLength.hidden = !editingCell
         }
     }
     
@@ -108,11 +108,12 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         layoutSubviews()
         
         if let newText = textField.text { videoModel.title = newText }
-        DataManager.sharedInstance.updateModels(indexPath.row, model: videoModel, identifier: videoIndentifier)
+        DataManager.sharedInstance.updateModels(videoModel, identifier: videoIndentifier)
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        editingCell = true
         return true
     }
 
