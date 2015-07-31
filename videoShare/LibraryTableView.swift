@@ -11,7 +11,7 @@ import UIKit
 import Photos
 import AVKit
 
-class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate,VideoCellProtocol {
+class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate ,VideoCellProtocol {
     
     @IBOutlet weak var tableViewHeader: UIView!
     @IBOutlet weak var tableView: UITableView! {
@@ -21,25 +21,35 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     }
     @IBOutlet weak var searchBtn: UIButton!
     @IBOutlet weak var tagBtn: UIButton!
-    @IBOutlet weak var searchBar: UIView! {
-        didSet {
-            searchBar.hidden = true
+    var searchBar: UISearchBar!
+    var searchBarHidden: Bool {
+        get {
+            return tableView.contentOffset.y > 0
         }
     }
-    @IBOutlet weak var searchBarPosY: NSLayoutConstraint!
-    var imageManager = PHImageManager.defaultManager()
-    var player: AVPlayer?
-    
-    @IBOutlet weak var searchTextField: UITextField! {
+    var disableBarBtns: Bool? {
         didSet {
-            searchTextField.addTarget(self, action: "textFieldDidChange:", forControlEvents: UIControlEvents.EditingChanged)
+            searchBtn.enabled = disableBarBtns!
+            tagBtn.enabled = disableBarBtns!
         }
     }
 
+    var imageManager = PHImageManager.defaultManager()
+    var player: AVPlayer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         DataManager.sharedInstance.checkForDirectory()
         DataManager.sharedInstance.fetchResults()
+        
+        searchBar = UISearchBar(frame: CGRectMake(0, 0, screenHeight, 50))
+        searchBar.delegate = self
+        tableView.tableHeaderView = searchBar
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(false)
+        hideSearchBar()
     }
     
 
@@ -117,50 +127,31 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     @IBAction func searchBtnTapped(sender: AnyObject) {
     
-        searchBar.hidden = false
-        searchBarPosY.constant = 0
-    
-        UIView.animateWithDuration(0.25, animations: { () -> Void in
-            self.view.layoutIfNeeded()
-            }) { (succeeded) -> Void in
-                self.searchTextField.becomeFirstResponder()
+        UIView.animateWithDuration(0.5) { () -> Void in
+            
+            if self.searchBarHidden {
+                self.tableView.contentOffset = CGPointMake(0, 0)
+            } else {
+                self.hideSearchBar()
+            }
         }
     }
     
-    @IBAction func cancelSearch(sender: AnyObject) {
+    func hideSearchBar() {
+        searchBar.resignFirstResponder()
+  
         
-        searchTextField.text = ""
-        searchTextField.resignFirstResponder()
-        searchBarPosY.constant = -75
-        DataManager.sharedInstance.filteredArray.removeAll()
-        tableView.reloadData()
+        let contentOffset = self.tableView.contentOffset;
+        let height: CGFloat = CGRectGetHeight(self.tableView.tableHeaderView!.frame);
+        let point = CGPoint(x: 0,y: height)
+        let newOffSet =  CGPoint(x: contentOffset.x, y: contentOffset.y + point.y)
+        self.tableView.contentOffset = newOffSet;
+    }
+    
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         
-        UIView.animateWithDuration(0.25, animations: { () -> Void in
-            self.view.layoutIfNeeded()
-            }) { (succeeded) -> Void in
-                self.searchBar.hidden = true
-                
-        }
-        
-    }
-    
-    func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
-        return true
-    }
-    
-    func textFieldDidEndEditing(textField: UITextField) {
-        textFieldDidChange(textField)
-    }
-    
-    
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        searchTextField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidChange(sender: UITextField) {
-
-        if let enteredText = sender.text {
+        if let enteredText = searchBar.text {
             DataManager.sharedInstance.filteredArray = DataManager.sharedInstance.masterVideoArray.filter({
                 let dict = $0.0
                 let key = $0.1 as String
@@ -172,7 +163,15 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         }
     }
     
-
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        hideSearchBar()
+        searchBar.resignFirstResponder()
+    }
     
     @IBAction func tagBtnTapped(sender: AnyObject) {
         print("filtered array \(DataManager.sharedInstance.filteredArray)")

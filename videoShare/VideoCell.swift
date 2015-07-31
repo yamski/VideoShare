@@ -22,6 +22,7 @@ extension UIButton {
 }
 
 protocol VideoCellProtocol {
+    var disableBarBtns: Bool? { get set}
     func launchVideo(index: Int)
 }
 
@@ -41,7 +42,7 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
     
     var editingCell: Bool! {
         didSet {
-//            tableView.allowsSelection = editingCell
+            self.delegate?.disableBarBtns = editingCell
             tableView.scrollEnabled = editingCell
             cancelText.hidden = editingCell
             saveText.hidden = editingCell
