@@ -11,22 +11,37 @@ import UIKit
 import Photos
 import AVKit
 
-class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate ,VideoCellProtocol {
+class LibraryTableView: UIViewController, VideoCellProtocol {
     
-    @IBOutlet weak var tableViewHeader: UIView!
+    @IBOutlet weak var tableViewHeader: UIView! {
+        didSet {
+            tableViewHeader.backgroundColor = UIColor(red:0.17, green:0.19, blue:0.22, alpha:1)
+        }
+    }
+    
     @IBOutlet weak var tableView: UITableView! {
         didSet {
             tableView.allowsSelection = false
         }
     }
-    @IBOutlet weak var searchBtn: UIButton!
-    @IBOutlet weak var tagBtn: UIButton!
-    var searchBar: UISearchBar!
-    var searchBarHidden: Bool {
-        get {
-            return tableView.contentOffset.y > 0
+    
+    @IBOutlet weak var tagTableView: UITableView! {
+        didSet {
+            tagTableView.backgroundColor = UIColor.magentaColor()
         }
     }
+    @IBOutlet weak var tagTableViewRighConstraint: NSLayoutConstraint!
+    @IBOutlet weak var searchBtn: UIButton!
+    @IBOutlet weak var tagBtn: UIButton!
+    
+    var searchBar: UISearchBar!
+    
+    var searchBarHidden: Bool {
+        return tableView.contentOffset.y > 0
+    }
+    
+    var isTagViewHidden = true
+    
     var disableBarBtns: Bool? {
         didSet {
             searchBtn.enabled = disableBarBtns!
@@ -37,6 +52,11 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     var imageManager = PHImageManager.defaultManager()
     var player: AVPlayer?
     
+    
+    var location: CGPoint?
+    var prevLocation: CGPoint?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         DataManager.sharedInstance.checkForDirectory()
@@ -45,50 +65,12 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         searchBar = UISearchBar(frame: CGRectMake(0, 0, screenHeight, 50))
         searchBar.delegate = self
         tableView.tableHeaderView = searchBar
+        print("frames: \(tagTableView.frame.origin.x), screen width: \(screenWidth)")
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(false)
         hideSearchBar()
-    }
-    
-
-    
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return DataManager.sharedInstance.getDataArray().count
-    }
-    
-    
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! VideoCell
-        
-        let dataArray = DataManager.sharedInstance.getDataArray()
-        let tempTuple = dataArray[indexPath.row]
-        
-        print("printing creation date: \(tempTuple.2.creationDate)")
-        let tempDict = tempTuple.0
-        
-        if let videoModel = tempDict[tempTuple.1] {
-            
-            cell.videoModel = videoModel
-            cell.videoIndentifier = videoModel.identifier
-            cell.videoLength.text = videoModel.durationString
-            cell.title.text = videoModel.title
-            cell.indexPath = indexPath
-        }
-        
-        cell.delegate = self
-        cell.videoBtn.tag = indexPath.row
-        cell.tableView = tableView
-        
-        imageManager.requestImageForAsset(tempTuple.2, targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
-       
-            if let cell = tableView.cellForRowAtIndexPath(indexPath) as? VideoCell {
-                cell.videoBtn.setBackgroundImage(result, forState: UIControlState.Normal)
-            }
-        }
-        return cell
     }
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -140,7 +122,6 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
     func hideSearchBar() {
         searchBar.resignFirstResponder()
   
-        
         let contentOffset = self.tableView.contentOffset;
         let height: CGFloat = CGRectGetHeight(self.tableView.tableHeaderView!.frame);
         let point = CGPoint(x: 0,y: height)
@@ -148,6 +129,153 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         self.tableView.contentOffset = newOffSet;
     }
     
+    @IBAction func tagBtnTapped(sender: AnyObject) {
+        
+        tagTableViewRighConstraint.constant = (isTagViewHidden ? 0 : -200)
+        !isTagViewHidden
+    
+        UIView.animateWithDuration(0.5) { () -> Void in
+                self.view.layoutIfNeeded()
+        }
+        
+    }
+    
+    func backToCamera() {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return UIStatusBarStyle.LightContent
+    }
+    
+    //MARK: Touches for top bar
+
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            
+            location = touch.locationInView(self.view)
+            prevLocation = location
+            
+            if (location!.y < searchBar.frame.height && location!.y - prevLocation!.y > 20){
+                tableViewHeader.touchesMoved(touches, withEvent: event)
+            }
+        }
+    }
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            
+            location = touch.locationInView(self.view)
+            tableViewHeader.frame = CGRectMake(0, location!.y - 10, tableViewHeader.frame.size.width, tableViewHeader.frame.size.height)
+            
+            if (location!.y > 200) {
+                
+                tableViewHeader.frame = CGRectMake(0, 200, tableViewHeader.frame.size.width, tableViewHeader.frame.size.height);
+            }
+        }
+    }
+    
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        
+        if (location!.y - prevLocation!.y > 20) {
+            slideTopBarToY(200)
+            
+        } else if (location!.y - prevLocation!.y > 0 && location!.y - prevLocation!.y <= 20) {
+            slideTopBarToY(200)
+            
+        } else if (location!.y - prevLocation!.y < -20) {
+            slideTopBarToY(0)
+            
+        } else if (location!.y - prevLocation!.y < 0 && location!.y - prevLocation!.y >= -20) {
+            slideTopBarToY(0)
+        }
+    }
+    
+    func slideTopBarToY(yPoint: CGFloat) {
+        
+        UIView.animateWithDuration(0.25, animations: { () -> Void in
+ 
+            self.tableViewHeader.frame = CGRectMake(0, yPoint, self.tableViewHeader.frame.size.width, self.tableViewHeader.frame.size.height)
+            self.view.layoutIfNeeded()
+        })
+    }
+   
+}
+
+//MARK: TableView Delegate & DataSource
+
+extension LibraryTableView: UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        var count = Int()
+        
+        if tableView == self.tableView {
+            count = DataManager.sharedInstance.getDataArray().count
+        } else if tableView == tagTableView {
+            count = 10
+        }
+        return count
+}
+    
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        var returningCell: UITableViewCell?
+        
+        if tableView == self.tableView {
+        
+            let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! VideoCell
+            let dataArray = DataManager.sharedInstance.getDataArray()
+            let tempTuple = dataArray[indexPath.row]
+            
+            print("printing creation date: \(tempTuple.2.creationDate)")
+            let tempDict = tempTuple.0
+            
+            if let videoModel = tempDict[tempTuple.1] {
+                
+                cell.videoModel = videoModel
+                cell.videoIndentifier = videoModel.identifier
+                cell.videoLength.text = videoModel.durationString
+                cell.title.text = videoModel.title
+                cell.indexPath = indexPath
+            }
+            
+            cell.delegate = self
+            cell.videoBtn.tag = indexPath.row
+            cell.tableView = tableView
+            
+            imageManager.requestImageForAsset(tempTuple.2, targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
+                
+                if let cell = tableView.cellForRowAtIndexPath(indexPath) as? VideoCell {
+                    cell.videoBtn.setBackgroundImage(result, forState: UIControlState.Normal)
+                }
+            }
+                returningCell = cell
+            
+        } else if tableView == tagTableView {
+            
+            let cell = tableView.dequeueReusableCellWithIdentifier("tagsCell", forIndexPath: indexPath)
+            returningCell = cell
+        }
+
+        return returningCell!
+
+    }
+    
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewControllerWithIdentifier("videoDetailedInfo") as! VideoDetailVC
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+}
+
+// MARK: Search Bar Delegate Methods
+
+extension LibraryTableView: UISearchBarDelegate {
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         
@@ -159,10 +287,10 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
                 
                 return videoModel!.title?.rangeOfString(enteredText, options: .CaseInsensitiveSearch) !=  nil
             })
+            
             tableView.reloadData()
         }
     }
-    
     
     func searchBarCancelButtonClicked(searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
@@ -172,11 +300,4 @@ class LibraryTableView: UIViewController, UITableViewDataSource, UITableViewDele
         hideSearchBar()
         searchBar.resignFirstResponder()
     }
-    
-    @IBAction func tagBtnTapped(sender: AnyObject) {
-        print("filtered array \(DataManager.sharedInstance.filteredArray)")
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-
-   
 }

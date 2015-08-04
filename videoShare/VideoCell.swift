@@ -26,12 +26,10 @@ protocol VideoCellProtocol {
     func launchVideo(index: Int)
 }
 
-class VideoCell: UITableViewCell, UITextFieldDelegate {
+class VideoCell: UITableViewCell {
     
     @IBOutlet weak var title: UITextField! 
     @IBOutlet weak var videoLength: UILabel!
-    @IBOutlet weak var cancelText: UIButton!
-    @IBOutlet weak var saveText: UIButton!
     @IBOutlet weak var videoBtn: UIButton!
     
     var delegate: VideoCellProtocol?
@@ -44,8 +42,6 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         didSet {
             self.delegate?.disableBarBtns = editingCell
             tableView.scrollEnabled = editingCell
-            cancelText.hidden = editingCell
-            saveText.hidden = editingCell
             videoBtn.enabled = editingCell
             videoLength.hidden = !editingCell
         }
@@ -70,10 +66,7 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        
         self.title.delegate = self
-        cancelText.hidden = true
-        saveText.hidden = true
     }
     
     
@@ -81,9 +74,26 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         delegate?.launchVideo(sender.tag)
     }
     
+
+    @IBAction func editTitle(sender: AnyObject) {
+        title.becomeFirstResponder()
+    }
+
+    @IBAction func addTags(sender: AnyObject) {
+
+    }
+    
+    
+    @IBAction func makeFavorite(sender: AnyObject) {
+        videoModel.isFavorite = !(videoModel.isFavorite)
+        DataManager.sharedInstance.updateModels(videoModel, identifier: videoIndentifier)
+    }
+}
+
+// MARK: TextField Delegate Methods
+
+extension VideoCell: UITextFieldDelegate {
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
-        
-        print("editing textfield")
         
         // y position of cell
         let rectInTableView = tableView.rectForRowAtIndexPath(indexPath)
@@ -92,12 +102,12 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         
         // mid point of screen, accounting for orientation
         let screenMidHeight = tableView.superview!.frame.midY
-       
+        
         if (yPoint >= screenMidHeight) {
             tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: UITableViewScrollPosition.Middle, animated: true)
         }
         print("y: \(yPoint), mid point: \(screenMidHeight)")
-
+        
         return true
     }
     
@@ -119,7 +129,5 @@ class VideoCell: UITableViewCell, UITextFieldDelegate {
         editingCell = true
         return true
     }
-
-    
-
 }
+

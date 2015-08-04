@@ -13,8 +13,12 @@ class DataManager {
     
     var dataFilePath: String?
     var archivedModelArray:[[String:VideoModel]]?
-    var masterVideoArray: [([String: VideoModel], String, PHAsset)] = []
-    var filteredArray: [([String: VideoModel], String, PHAsset)] = []
+    
+    typealias tupleModel = ([String: VideoModel], String, PHAsset)
+    
+    var masterVideoArray = [tupleModel]()
+    var filteredArray = [tupleModel]()
+    var savedTags: [String]? 
     
     var userIsSearching: Bool {
         get{

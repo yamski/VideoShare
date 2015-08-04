@@ -9,9 +9,9 @@ import UIKit
 import AVFoundation
 import GLKit
 import CoreMedia
-import AssetsLibrary
+import Photos
 
-class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureFileOutputRecordingDelegate, TopButtonProtocol, MenuProtocol {
+class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, TopButtonProtocol, MenuProtocol {
     
     var session: AVCaptureSession!
     var backCameraDevice: AVCaptureDevice?
@@ -26,15 +26,15 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     
     var topBar: TopBar!
     var menu: Menu?
-
     var flashIsOn = false
+    var showMenu = true
     
     var timeSec = 0
     var timeMin = 0
     var timeHr = 0
     var timer: NSTimer?
     
-    var showMenu = true
+    @IBOutlet weak var libraryBtn: UIButton!
     
     @IBOutlet weak var recordButton: UIButton! {
         didSet {
@@ -42,70 +42,65 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
     }
     
-    @IBOutlet weak var libraryBtn: UIButton!
+
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
    
         session = AVCaptureSession()
-        setupCameraInputs()
-        addAudio()
-        setupPreview()
+        setupPreviewWithInputs(setupCameraInputs, outputs: setupCameraOutput)
         buildTopBarView()
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "orientationChanged:", name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
+        
         super.viewWillAppear(false)
         navigationController?.navigationBarHidden = true
         session.startRunning()
     }
     
+    
     override func viewDidDisappear(animated: Bool) {
+        
         super.viewDidDisappear(false)
         session.stopRunning()
     }
     
+    
     func buildTopBarView() {
+        
         topBar = TopBar()
         topBar.delegate = self
         view.addSubview(topBar)
     }
     
-    func addAudio() {
-        do {
-            let audioCaptureDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeAudio)
-            
-//            let audioInput = AVCaptureDeviceInput.deviceInputWithDevice(audioCaptureDevice) as AVCaptureDeviceInput
-            let audioInput = try AVCaptureDeviceInput(device: audioCaptureDevice)
-            session.addInput(audioInput)
-        
-//            if let hasAudioInput = audioInput { session.addInput(audioInput) }
-        } catch let error as NSError{
-            print(error.description)
-        }
-        session.commitConfiguration()
-    }
+    
 
-    func setupPreview() {
+    func setupPreviewWithInputs(inputs: () -> (), outputs: () -> ()) {
         
         dispatch_async(dispatch_get_main_queue()) {
-            print("new session")
+            
             self.previewLayer = PreviewLayerVC()
             self.previewLayer!.session = self.session
             self.previewLayer!.pLayer.frame = self.view.frame
             self.view.insertSubview(self.previewLayer!.view, atIndex: 0)
-    
-            self.session.startRunning()
-//            self.checkAuthorizition()
-            self.setupCameraOutput()
         }
+        
+        inputs()
+        outputs()
+        
+        self.session.startRunning()
+        //            self.checkAuthorizition()
     }
     
+    
     func setupCameraInputs() {
+        
         let availableCameraDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
+        
         for device in availableCameraDevices as! [AVCaptureDevice] {
             if device.position == .Back {
                 backCameraDevice = device
@@ -117,6 +112,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         do {
             possibleCameraInput = try AVCaptureDeviceInput(device: backCameraDevice)
             activeCameraDevice = backCameraDevice
+            
         } catch let outError as NSError {
             print(outError.description)
             possibleCameraInput = nil
@@ -127,7 +123,24 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 self.session.addInput(cameraInput)
             }
         }
+        
+        addAudio()
     }
+    
+    
+    func addAudio() {
+        
+        do {
+            let audioCaptureDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeAudio)
+            let audioInput = try AVCaptureDeviceInput(device: audioCaptureDevice)
+            session.addInput(audioInput)
+            
+        } catch let error as NSError{
+            print(error.description)
+        }
+        session.commitConfiguration()
+    }
+    
     
     func setupCameraOutput() {
 
@@ -164,15 +177,14 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: { (granted:Bool) -> Void in
                 
                     if granted {
-                        // go ahead
 //                        self.setupPreview()
                         self.setupCameraOutput()
-                        
                     }
                     else {
                         // user denied, nothing much to do
                     }
             })
+            
         case .Authorized:
             
 //            setupPreview()
@@ -224,13 +236,12 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     
     @IBAction func recordButtonTapped(sender: UIButton) {
         
-        if (!weAreRecording)
-            
-        {
-            print("START RECORDING")
+        if (!weAreRecording) {
+
             weAreRecording = true
             
-            let outputPath: NSString = "\(NSTemporaryDirectory()) + output.mov"
+            let uuid = NSUUID().UUIDString
+            let outputPath: NSString = "\(NSTemporaryDirectory()) + \(uuid) + output.mov"
             let outputURL = NSURL(fileURLWithPath: outputPath as String)
             movieFileOutput?.startRecordingToOutputFileURL(outputURL, recordingDelegate: self)
             
@@ -242,7 +253,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             
         } else {
             
-            print("STOP RECORDING")
             weAreRecording = false;
             movieFileOutput?.stopRecording()
             
@@ -256,27 +266,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             timeSec = 0
             timeMin = 0
         }
-        
     }
     
-    func captureOutput(captureOutput: AVCaptureFileOutput!, didStartRecordingToOutputFileAtURL fileURL: NSURL!, fromConnections connections: [AnyObject]!) {
-        
-        print("starting to record")
-    }
-    
-    func captureOutput(captureOutput: AVCaptureFileOutput!, didFinishRecordingToOutputFileAtURL outputFileURL: NSURL!, fromConnections connections: [AnyObject]!, error: NSError!) {
-        
-        
-        print("didFinishRecordingToOutputFileAtURL - enter");
-        
-        let recordedSuccessfully = true;
-        
-        if (recordedSuccessfully) {
-            print("didFinishRecordingToOutputFileAtURL - success");
-            let library = ALAssetsLibrary()
-            library.writeVideoAtPathToSavedPhotosAlbum(outputFileURL, completionBlock: nil)
-        }
-    }
     
 
     func selectCamera() {
@@ -295,31 +286,27 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             topBar.flashLabel.alpha = 0.25
         
         } else {
+            
             activeCameraDevice = cameraWithPosition(AVCaptureDevicePosition.Back)
             topBar.flashBtn.alpha = 1.0
             topBar.flashBtn.enabled = true
             topBar.flashLabel.alpha = 1.0
         }
-        
-       
 
         do {
             possibleCameraInput = try AVCaptureDeviceInput(device:activeCameraDevice)
             session.addInput(possibleCameraInput as! AVCaptureInput)
+            
         } catch let error as NSError {
             
             possibleCameraInput = nil
             print("Error creating capture device input: \(error.localizedDescription)");
 
         }
-//        
-//        if(error != nil) {
-//            print("Error creating capture device input: \(error!.localizedDescription)");
-//        } else { session.addInput(possibleCameraInput as! AVCaptureInput)}
 
         addAudio()
-        session.commitConfiguration()
     }
+    
     
     
     func cameraWithPosition(position: AVCaptureDevicePosition) -> AVCaptureDevice? {
@@ -335,20 +322,35 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
     
     
+    
+    @IBAction func libraryBtnTapped(sender: AnyObject) {
+        performSegueWithIdentifier("ToLibrary", sender: self)
+    }
+    
+    
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+    
+    
+    
+    //MARK: Tap Focus
+    
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
         if let touch = touches.first {
             
             let point = touch.locationInView(self.view)
             let newPoint = previewLayer!.pLayer.captureDevicePointOfInterestForPoint(point)
-
+            
             focusWithMode(AVCaptureFocusMode.AutoFocus, exposureMode: AVCaptureExposureMode.AutoExpose, point: newPoint, monitorSubjectAreaChange: true)
             
             menu?.exposureSlider.setValue(0.5, animated: true)
-
+            
         }
     }
-
+    
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchesBegan(touches, withEvent: event)
         
@@ -384,6 +386,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     
+    
+    //MARK: Menu Bar
+
     func showHideMenu() {
     
         if showMenu {
@@ -395,13 +400,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 
                 menu!.tempSlider.setValue(tempAndTintValues.temperature, animated: true)
                 menu!.tintSlider.value = tempAndTintValues.tint
-                
-                print("temp is \(tempAndTintValues.temperature), value is \(menu?.tempSlider.value)", appendNewline: false)
-                print("tint is \(tempAndTintValues.tint), value is \(menu?.tintSlider.value)", appendNewline: false)
             }
-            
         }
-        
         
         UIView.animateWithDuration(0.25, animations: { () -> Void in
             
@@ -410,131 +410,30 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             if self.showMenu {
                 
                 if (orientation == .Portrait) {
-                    
-                    print("show menu portrait", appendNewline: false)
                     self.menu?.frame.origin = CGPointMake(0, self.topBar.frame.height)
                     
                 } else if (orientation == .LandscapeLeft) {
-                    print("show menu landscape", appendNewline: false)
                     self.menu?.frame.origin = CGPointMake(screenWidth - (self.menu!.frame.width + 50), 0)
                 }
+                
                 self.showMenu = false
+                
             } else {
                 
                 if (orientation == .Portrait) {
-                    
-                    print("hide menu portrait", appendNewline: false)
                     self.menu?.frame.origin = CGPointMake(0, 0 - (self.topBar.frame.height + self.menu!.frame.height))
  
                 } else if (orientation == .LandscapeLeft) {
-                    print("hide menu landscape", appendNewline: false)
                     self.menu?.frame.origin = CGPointMake(screenWidth + (self.menu!.frame.width + 50), 0)
-          
                 }
-                
                 self.showMenu = true
             }
             
             }, completion:
-            {(Bool) in if (self.showMenu) { self.menu?.removeFromSuperview()
-    
-                }
+            {(Bool) in if (self.showMenu) { self.menu?.removeFromSuperview() }
         })
     }
-
-    func getOrientation() -> UIDeviceOrientation {
-        return UIDevice.currentDevice().orientation
-    }
  
-    func adjustExposure(sender: UISlider) {
-        
-        print("adjust exposure", appendNewline: false)
-        
-        let isoValue = sender.value
-        
-        if let device = activeCameraDevice {
-//            if(device.lockForConfiguration())
-            
-            do {
-                try device.lockForConfiguration()
-                
-                // Adjust the iso to clamp between minIso and maxIso based on the active format
-                let minISO = device.activeFormat.minISO
-                let maxISO = device.activeFormat.maxISO
-                let clampedISO = isoValue * (maxISO - minISO) + minISO
-                
-                print("iso info: \(minISO),\(maxISO), \(clampedISO) ")
-                
-                device.setExposureModeCustomWithDuration(AVCaptureExposureDurationCurrent, ISO: clampedISO, completionHandler: { (time) -> Void in
-                    //
-                })
-                
-                device.unlockForConfiguration()
-            } catch let error as NSError {
-                print(error.description)
-               
-            }
-        }
-    }
-    
-    func adjustTemp(sender: UISlider) {
-        
-        print("adjust temp", appendNewline: false)
-        let tempAndTint = AVCaptureWhiteBalanceTemperatureAndTintValues(temperature: menu!.tempSlider.value, tint: menu!.tintSlider.value)
-        setWhiteBalanceGains(activeCameraDevice!.deviceWhiteBalanceGainsForTemperatureAndTintValues(tempAndTint))
-    }
-    
-    
-    func adjustTint(sender: UISlider) {
-        
-        print("adjust tint", appendNewline: false)
-        let tempAndTint = AVCaptureWhiteBalanceTemperatureAndTintValues(temperature: menu!.tempSlider.value, tint: menu!.tintSlider.value)
-        setWhiteBalanceGains(activeCameraDevice!.deviceWhiteBalanceGainsForTemperatureAndTintValues(tempAndTint))
-        
-        activeCameraDevice?.deviceWhiteBalanceGains
-    }
-    
-    
-    func setWhiteBalanceGains(gains: AVCaptureWhiteBalanceGains) {
-//        let error: NSError?
-//        
-//        if ((activeCameraDevice?.lockForConfiguration()) != nil) {
-//            
-//            let normalized = normalizedGains(gains)  // Conversion can yield out-of-bound values, cap to limits
-//            activeCameraDevice?.setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains(normalized, completionHandler: nil)
-//            activeCameraDevice?.unlockForConfiguration()
-//        } else {
-//            print("\(error)")
-//        }
-        
-        do {
-            try activeCameraDevice?.lockForConfiguration()
-            let normalized = normalizedGains(gains)  // Conversion can yield out-of-bound values, cap to limits
-            activeCameraDevice?.setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains(normalized, completionHandler: nil)
-            activeCameraDevice?.unlockForConfiguration()
-        } catch let error as NSError {
-            print(error.description)
-        }
-        
-        
-    }
-    
-    
-    func normalizedGains(gains: AVCaptureWhiteBalanceGains) -> AVCaptureWhiteBalanceGains {
-        var g: AVCaptureWhiteBalanceGains = gains
-        
-        g.redGain = max(1.0, g.redGain);
-        g.greenGain = max(1.0, g.greenGain);
-        g.blueGain = max(1.0, g.blueGain);
-        
-        g.redGain = min(activeCameraDevice!.maxWhiteBalanceGain, g.redGain);
-        g.greenGain = min(activeCameraDevice!.maxWhiteBalanceGain, g.greenGain);
-        g.blueGain = min(activeCameraDevice!.maxWhiteBalanceGain, g.blueGain);
-        
-        return g
-        
-    }
-    
 
     func timerTick(timer: NSTimer) {
         
@@ -557,6 +456,18 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     
 
     
+    //Mark: Orientation Related
+    
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
+    
+    
+    func getOrientation() -> UIDeviceOrientation {
+        return UIDevice.currentDevice().orientation
+    }
+    
+    
     func orientationChanged(notif: NSNotification) {
         
         var barWidth: CGFloat = 0
@@ -567,30 +478,28 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         var position = CGPoint(x: 0,y: 0)
         var menuPosition = CGPoint(x: 0, y:50)
         
-        print("\(orientation.rawValue), \(orientation.isValidInterfaceOrientation)")
         
         switch orientation {
             
-            case .Portrait, .PortraitUpsideDown, .FaceUp, .FaceDown, .Unknown:
-                barWidth = screenWidth
-                barHeight = 50
-                position.x = 0
-                position.y = 0
-                menuPosition.x = 0
-                menuPosition.y = 50
+        case .Portrait, .PortraitUpsideDown, .FaceUp, .FaceDown, .Unknown:
+            barWidth = screenWidth
+            barHeight = 50
+            position.x = 0
+            position.y = 0
+            menuPosition.x = 0
+            menuPosition.y = 50
             
-            case .LandscapeLeft, .LandscapeRight:
-                angle = CGFloat(M_PI_2)
-                barWidth = 50
-                barHeight = screenHeight
-                position.x = screenWidth - topBar.frame.size.height
-                
-                if let menuBox = menu {
-                    menuPosition.x = screenWidth - menuBox.frame.size.height - topBar.frame.size.height
-                    menuPosition.y = 0
-                }
+        case .LandscapeLeft, .LandscapeRight:
+            angle = CGFloat(M_PI_2)
+            barWidth = 50
+            barHeight = screenHeight
+            position.x = screenWidth - topBar.frame.size.height
+            
+            if let menuBox = menu {
+                menuPosition.x = screenWidth - menuBox.frame.size.height - topBar.frame.size.height
+                menuPosition.y = 0
+            }
         }
-
         
         UIView.animateWithDuration(0.25, animations: { () -> Void in
             
@@ -599,7 +508,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             self.topBar.frame.origin = position
             self.topBar.frame.size.width = barWidth
             self.topBar.frame.size.height = barHeight
-    
+            
             self.recordButton.transform = CGAffineTransformMakeRotation(angle)
             
             if (self.menu != nil) {
@@ -609,29 +518,111 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 self.menu?.frame.origin.y = menuPosition.y
             }
             
-            print("width: \(self.topBar.frame.width), height: \(self.topBar.frame.height)")
-            print("position: \(position)")
-    
-        }) { (Bool) -> Void in
-            self.topBar.hidden = false
-            self.menu?.hidden = false
+            //            print("width: \(self.topBar.frame.width), height: \(self.topBar.frame.height)")
+            //            print("position: \(position)")
+            
+            }) { (Bool) -> Void in
+                self.topBar.hidden = false
+                self.menu?.hidden = false
         }
     }
     
-
-    @IBAction func libraryBtnTapped(sender: AnyObject) {
-        performSegueWithIdentifier("ToLibrary", sender: self)
-    }
-
-    override func shouldAutorotate() -> Bool {
-        return false
+    
+    //MARK: Manual Video Adjustments
+    
+    func adjustExposure(sender: UISlider) {
+        
+        let isoValue = sender.value
+        
+        if let device = activeCameraDevice {
+            //            if(device.lockForConfiguration())
+            
+            do {
+                try device.lockForConfiguration()
+                
+                // Adjust the iso to clamp between minIso and maxIso based on the active format
+                let minISO = device.activeFormat.minISO
+                let maxISO = device.activeFormat.maxISO
+                let clampedISO = isoValue * (maxISO - minISO) + minISO
+                
+                device.setExposureModeCustomWithDuration(AVCaptureExposureDurationCurrent, ISO: clampedISO, completionHandler: { (time) -> Void in
+                })
+                
+                device.unlockForConfiguration()
+            } catch let error as NSError {
+                print(error.description)
+                
+            }
+        }
     }
     
-    override func prefersStatusBarHidden() -> Bool {
-        return true
+    func adjustTemp(sender: UISlider) {
+        
+        let tempAndTint = AVCaptureWhiteBalanceTemperatureAndTintValues(temperature: menu!.tempSlider.value, tint: menu!.tintSlider.value)
+        setWhiteBalanceGains(activeCameraDevice!.deviceWhiteBalanceGainsForTemperatureAndTintValues(tempAndTint))
     }
     
+    
+    func adjustTint(sender: UISlider) {
+        
+        let tempAndTint = AVCaptureWhiteBalanceTemperatureAndTintValues(temperature: menu!.tempSlider.value, tint: menu!.tintSlider.value)
+        setWhiteBalanceGains(activeCameraDevice!.deviceWhiteBalanceGainsForTemperatureAndTintValues(tempAndTint))
+        
+        activeCameraDevice?.deviceWhiteBalanceGains
+    }
+    
+    
+    func setWhiteBalanceGains(gains: AVCaptureWhiteBalanceGains) {
+        
+        do {
+            try activeCameraDevice?.lockForConfiguration()
+            let normalized = normalizedGains(gains)  // Conversion can yield out-of-bound values, cap to limits
+            activeCameraDevice?.setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains(normalized, completionHandler: nil)
+            activeCameraDevice?.unlockForConfiguration()
+        } catch let error as NSError {
+            print(error.description)
+        }
+    }
+    
+    
+    func normalizedGains(gains: AVCaptureWhiteBalanceGains) -> AVCaptureWhiteBalanceGains {
+        var g: AVCaptureWhiteBalanceGains = gains
+        
+        g.redGain = max(1.0, g.redGain);
+        g.greenGain = max(1.0, g.greenGain);
+        g.blueGain = max(1.0, g.blueGain);
+        
+        g.redGain = min(activeCameraDevice!.maxWhiteBalanceGain, g.redGain);
+        g.greenGain = min(activeCameraDevice!.maxWhiteBalanceGain, g.greenGain);
+        g.blueGain = min(activeCameraDevice!.maxWhiteBalanceGain, g.blueGain);
+        
+        return g
+    }
 
+}
 
+//MARK: Capture Output Methods
+extension CameraViewController: AVCaptureFileOutputRecordingDelegate {
+    
+    func captureOutput(captureOutput: AVCaptureFileOutput!, didStartRecordingToOutputFileAtURL fileURL: NSURL!, fromConnections connections: [AnyObject]!) {
+        
+        print("starting to record")
+    }
+    
+    func captureOutput(captureOutput: AVCaptureFileOutput!, didFinishRecordingToOutputFileAtURL outputFileURL: NSURL!, fromConnections connections: [AnyObject]!, error: NSError!) {
+        
+        let recordedSuccessfully = true;
+        
+        if (recordedSuccessfully) {
+            print("didFinishRecordingToOutputFileAtURL - success");
+            
+            PHPhotoLibrary.sharedPhotoLibrary().performChanges({ () -> Void in
+                PHAssetChangeRequest.creationRequestForAssetFromVideoAtFileURL(outputFileURL)
+                }, completionHandler: { (succeeded, error) -> Void in
+                    print("change request complete")
+            })
+        }
+    }
+    
 }
 

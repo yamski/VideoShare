@@ -13,8 +13,9 @@
 		D0382AC81B6047A200343FCE /* LibraryTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0382AC71B6047A200343FCE /* LibraryTableView.swift */; };
 		D0382ACA1B604E0000343FCE /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0382AC91B604E0000343FCE /* VideoCell.swift */; };
 		D0382ACC1B6188A500343FCE /* VideoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0382ACB1B6188A500343FCE /* VideoModel.swift */; };
+		D08CCDF71B71336C00E50CA4 /* VideoDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D08CCDF61B71336C00E50CA4 /* VideoDetailVC.swift */; };
 		D09F1D2E1AF40CB7002E9549 /* PreviewLayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09F1D2D1AF40CB7002E9549 /* PreviewLayerVC.swift */; };
-		D09F1D321AF7DDE8002E9549 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09F1D311AF7DDE8002E9549 /* ViewController.swift */; };
+		D09F1D321AF7DDE8002E9549 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09F1D311AF7DDE8002E9549 /* CameraViewController.swift */; };
 		D09F1D341AF7FD2F002E9549 /* NavController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09F1D331AF7FD2F002E9549 /* NavController.swift */; };
 		D0A381CE1AA3B483003022C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A381CD1AA3B483003022C3 /* AppDelegate.swift */; };
 		D0A381D31AA3B483003022C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0A381D11AA3B483003022C3 /* Main.storyboard */; };
@@ -42,8 +43,9 @@
 		D0382AC71B6047A200343FCE /* LibraryTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryTableView.swift; sourceTree = "<group>"; };
 		D0382AC91B604E0000343FCE /* VideoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		D0382ACB1B6188A500343FCE /* VideoModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoModel.swift; sourceTree = "<group>"; };
+		D08CCDF61B71336C00E50CA4 /* VideoDetailVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDetailVC.swift; sourceTree = "<group>"; };
 		D09F1D2D1AF40CB7002E9549 /* PreviewLayerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewLayerVC.swift; sourceTree = "<group>"; };
-		D09F1D311AF7DDE8002E9549 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D09F1D311AF7DDE8002E9549 /* CameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		D09F1D331AF7FD2F002E9549 /* NavController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavController.swift; sourceTree = "<group>"; };
 		D0A381C81AA3B482003022C3 /* videoShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = videoShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0A381CC1AA3B483003022C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -138,8 +140,9 @@
 			children = (
 				D09F1D2D1AF40CB7002E9549 /* PreviewLayerVC.swift */,
 				D09F1D331AF7FD2F002E9549 /* NavController.swift */,
-				D09F1D311AF7DDE8002E9549 /* ViewController.swift */,
+				D09F1D311AF7DDE8002E9549 /* CameraViewController.swift */,
 				D0382AC71B6047A200343FCE /* LibraryTableView.swift */,
+				D08CCDF61B71336C00E50CA4 /* VideoDetailVC.swift */,
 				D0E288D11B4ACF78006196DC /* AVPlayerVC.swift */,
 			);
 			name = "view controllers";
@@ -273,6 +276,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D08CCDF71B71336C00E50CA4 /* VideoDetailVC.swift in Sources */,
 				D022D9D51B24C09D006D42DD /* Constants.swift in Sources */,
 				D0AD29C71B66A6B000CF4A63 /* DataManager.swift in Sources */,
 				D0088BF61B3C5D0C0026D0E7 /* TopBar.swift in Sources */,
@@ -282,7 +286,7 @@
 				D0E288D21B4ACF79006196DC /* AVPlayerVC.swift in Sources */,
 				D0382ACC1B6188A500343FCE /* VideoModel.swift in Sources */,
 				D0A381CE1AA3B483003022C3 /* AppDelegate.swift in Sources */,
-				D09F1D321AF7DDE8002E9549 /* ViewController.swift in Sources */,
+				D09F1D321AF7DDE8002E9549 /* CameraViewController.swift in Sources */,
 				D0382AC81B6047A200343FCE /* LibraryTableView.swift in Sources */,
 				D09F1D2E1AF40CB7002E9549 /* PreviewLayerVC.swift in Sources */,
 			);

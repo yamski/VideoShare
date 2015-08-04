@@ -10,40 +10,43 @@ import Foundation
 import Photos
 
 protocol Video {
-//    var asset: PHAsset  { get }
+
     var identifier: String { get }
     var duration: NSTimeInterval { get }
     var durationString: String! { get }
     var title: String? { get set }
     var tags: [String] { get set }
+    var isFavorite: Bool! {get set}
 }
 
 
 class VideoModel: NSObject, NSCoding, Video {
-//    let asset: PHAsset
+
     let identifier: String
     var duration: NSTimeInterval
     var durationString: String!
     var title: String?
     var tags: [String]
+    var isFavorite: Bool!
 
     init(asset:PHAsset, duration: NSTimeInterval){
-//        self.asset = asset
-        self.identifier = asset.localIdentifier
+
+        identifier = asset.localIdentifier
         self.duration = duration
-//        self.title = "Untitled"
-        self.tags = []
+        tags = []
+        isFavorite = false
         super.init()
         self.durationString = stringFromTimeInterval(duration) as String
     }
     
     required init(coder decoder: NSCoder) {
      
-        self.identifier = decoder.decodeObjectForKey("indentifier") as! String
-        self.duration = decoder.decodeDoubleForKey("duration")
-        self.durationString = decoder.decodeObjectForKey("durationString") as! String
-        self.title = decoder.decodeObjectForKey("title") as? String
-        self.tags = decoder.decodeObjectForKey("tags") as! [String]
+        identifier = decoder.decodeObjectForKey("indentifier") as! String
+        duration = decoder.decodeDoubleForKey("duration")
+        durationString = decoder.decodeObjectForKey("durationString") as! String
+        title = decoder.decodeObjectForKey("title") as? String
+        tags = decoder.decodeObjectForKey("tags") as! [String]
+        isFavorite = decoder.decodeBoolForKey("isFavorite") as Bool
     }
     
     func encodeWithCoder(coder: NSCoder) {
@@ -52,6 +55,7 @@ class VideoModel: NSObject, NSCoding, Video {
         coder.encodeObject(durationString, forKey: "durationString")
         coder.encodeObject(title, forKey: "title")
         coder.encodeObject(tags, forKey: "tags")
+        coder.encodeBool(isFavorite, forKey: "isFavorite")
     }
     
     func stringFromTimeInterval(interval:NSTimeInterval) -> NSString {
