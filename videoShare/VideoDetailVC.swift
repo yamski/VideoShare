@@ -7,29 +7,38 @@
 //
 
 import UIKit
+import Photos
 
 class VideoDetailVC: UIViewController {
+    
+    var player: AVPlayer! {
+        didSet {
+            configureView()
+        }
+    }
+    
+    var video: VideoModel!
+    var asset: PHAsset!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(false)
+        navigationController?.navigationBar.hidden = true
+    }
+    
+    func configureView() {
+        
+        print("config")
+        let avLayer = AVPlayerLayer(player: player)
+        avLayer.frame = CGRectMake(0, 10, screenWidth, 200)
+        view.layer.addSublayer(avLayer)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

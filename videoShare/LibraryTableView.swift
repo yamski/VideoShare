@@ -11,7 +11,7 @@ import UIKit
 import Photos
 import AVKit
 
-class LibraryTableView: UIViewController, VideoCellProtocol {
+class LibraryTableView: UIViewController {
     
     @IBOutlet weak var tableViewHeader: UIView! {
         didSet {
@@ -21,7 +21,7 @@ class LibraryTableView: UIViewController, VideoCellProtocol {
     
     @IBOutlet weak var tableView: UITableView! {
         didSet {
-            tableView.allowsSelection = false
+            tableView.allowsSelection = true
         }
     }
     
@@ -85,27 +85,6 @@ class LibraryTableView: UIViewController, VideoCellProtocol {
     }
     
     
-    func launchVideo(index: Int) {
-        
-        let dataArray = DataManager.sharedInstance.getDataArray()
-        let videoObject = dataArray[index]
-
-        let result = PHAsset.fetchAssetsWithLocalIdentifiers([videoObject.1], options: nil)
-        
-        result.enumerateObjectsUsingBlock { (asset, index, stop) -> Void in
-            
-            let video = asset as! PHAsset
-            
-            self.imageManager.requestPlayerItemForVideo(video, options: nil) { (playerItem, info) -> Void in
-                
-                self.player = AVPlayer(playerItem: playerItem!)
-                
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.performSegueWithIdentifier("VideoPlayer", sender: self)
-                })
-            }
-        }
-    }
     
     @IBAction func searchBtnTapped(sender: AnyObject) {
     
@@ -260,15 +239,6 @@ extension LibraryTableView: UITableViewDelegate, UITableViewDataSource {
         }
 
         return returningCell!
-
-    }
-    
-    
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewControllerWithIdentifier("videoDetailedInfo") as! VideoDetailVC
-        navigationController?.pushViewController(vc, animated: true)
     }
     
 }
@@ -300,4 +270,50 @@ extension LibraryTableView: UISearchBarDelegate {
         hideSearchBar()
         searchBar.resignFirstResponder()
     }
+}
+
+extension LibraryTableView: VideoCellProtocol {
+    
+    func launchVideo(index: Int) {
+        
+        let dataArray = DataManager.sharedInstance.getDataArray()
+        let videoObject = dataArray[index]
+        
+        let result = PHAsset.fetchAssetsWithLocalIdentifiers([videoObject.1], options: nil)
+        
+        result.enumerateObjectsUsingBlock { (asset, index, stop) -> Void in
+            
+            let video = asset as! PHAsset
+            
+            self.imageManager.requestPlayerItemForVideo(video, options: nil) { (playerItem, info) -> Void in
+                
+                self.player = AVPlayer(playerItem: playerItem!)
+                
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.performSegueWithIdentifier("VideoPlayer", sender: self)
+                })
+            }
+        }
+    }
+    
+    func editInfo(index: Int) {
+
+        if let vc = storyboard?.instantiateViewControllerWithIdentifier("videoDetailedInfo") as? VideoDetailVC {
+        
+            let dataArray = DataManager.sharedInstance.getDataArray()[index]
+            let dict = dataArray.0
+            vc.video = dict[dataArray.1]
+            vc.asset = dataArray.2
+            
+            self.imageManager.requestPlayerItemForVideo(dataArray.2, options: nil) { (playerItem, info) -> Void in
+
+                vc.player = AVPlayer(playerItem: playerItem!)
+                
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    navigationController?.pushViewController(vc, animated: true)
+                })
+            }
+        }
+    }
+    
 }

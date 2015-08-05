@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+
 extension UIButton {
     @IBInspectable var cornerRadius: CGFloat {
         get {
@@ -24,6 +25,7 @@ extension UIButton {
 protocol VideoCellProtocol {
     var disableBarBtns: Bool? { get set}
     func launchVideo(index: Int)
+    func editInfo(index: Int)
 }
 
 class VideoCell: UITableViewCell {
@@ -75,9 +77,10 @@ class VideoCell: UITableViewCell {
     }
     
 
-    @IBAction func editTitle(sender: AnyObject) {
-        title.becomeFirstResponder()
+    @IBAction func editVideoInfo(sender: AnyObject) {
+        self.delegate?.editInfo(indexPath.row)
     }
+ 
 
     @IBAction func addTags(sender: AnyObject) {
 

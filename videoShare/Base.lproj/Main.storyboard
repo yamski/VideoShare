@@ -119,12 +119,12 @@
                     <connections>
                         <outlet property="libraryBtn" destination="YyO-PR-wKd" id="Zmf-8m-5F4"/>
                         <outlet property="recordButton" destination="y6O-8V-1MB" id="q6H-1J-gKc"/>
-                        <segue destination="8d9-wf-fyB" kind="presentation" identifier="ToLibrary" id="YL4-BC-dDI"/>
+                        <segue destination="uPY-Ch-XRs" kind="presentation" identifier="ToLibrary" id="YL4-BC-dDI"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2954" y="233"/>
+            <point key="canvasLocation" x="3766" y="233"/>
         </scene>
         <!--Library Table View-->
         <scene sceneID="KzS-x4-1w7">
@@ -144,7 +144,7 @@
                                 <color key="sectionIndexBackgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="1UX-yg-29f" customClass="VideoCell" customModule="videoShare" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="22" width="600" height="100"/>
+                                        <rect key="frame" x="0.0" y="86" width="600" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1UX-yg-29f" id="HtC-vN-NXb">
                                             <rect key="frame" x="0.0" y="0.0" width="600" height="99.5"/>
@@ -214,8 +214,7 @@
                                                     </constraints>
                                                     <state key="normal" backgroundImage="editDark"/>
                                                     <connections>
-                                                        <action selector="editTitle:" destination="1UX-yg-29f" eventType="touchUpInside" id="Mnf-vj-5h1"/>
-                                                        <action selector="editTitleBtn:" destination="1UX-yg-29f" eventType="touchUpInside" id="Pez-9F-Jjx"/>
+                                                        <action selector="editVideoInfo:" destination="1UX-yg-29f" eventType="touchUpInside" id="dQO-54-kEb"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -335,6 +334,7 @@
                             </mask>
                         </variation>
                     </view>
+                    <navigationItem key="navigationItem" id="fCM-Rf-lTZ"/>
                     <connections>
                         <outlet property="searchBtn" destination="bBn-0K-aoD" id="8GD-FR-hv8"/>
                         <outlet property="tableView" destination="WbC-dK-xcW" id="EO3-Mj-BjZ"/>
@@ -348,7 +348,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Kr2-eV-0Gm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3731" y="233"/>
+            <point key="canvasLocation" x="5355" y="233"/>
         </scene>
         <!--AV Player View Controller-->
         <scene sceneID="LJE-Zs-w5m">
@@ -356,7 +356,7 @@
                 <avPlayerViewController videoGravity="AVLayerVideoGravityResizeAspect" id="VSa-AS-46b" customClass="AVPlayerVC" customModule="videoShare" customModuleProvider="target" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bgi-nq-ZZj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4523" y="-39"/>
+            <point key="canvasLocation" x="6147" y="-39"/>
         </scene>
         <!--Video DetailVC-->
         <scene sceneID="RxB-AT-Qox">
@@ -369,12 +369,33 @@
                     <view key="view" contentMode="scaleToFill" id="Eo6-KM-zLq">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="0.80000000000000004" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
+                    <keyCommands>
+                        <keyCommand/>
+                    </keyCommands>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7bf-iI-kl2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4523" y="642"/>
+            <point key="canvasLocation" x="6147" y="642"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="vTK-jx-LzF">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="uPY-Ch-XRs" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="aPn-83-jyv">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="8d9-wf-fyB" kind="relationship" relationship="rootViewController" id="POl-Hg-z1T"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4543" y="233"/>
         </scene>
     </scenes>
     <resources>
