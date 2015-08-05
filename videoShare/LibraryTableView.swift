@@ -24,13 +24,7 @@ class LibraryTableView: UIViewController {
             tableView.allowsSelection = true
         }
     }
-    
-    @IBOutlet weak var tagTableView: UITableView! {
-        didSet {
-            tagTableView.backgroundColor = UIColor.magentaColor()
-        }
-    }
-    @IBOutlet weak var tagTableViewRighConstraint: NSLayoutConstraint!
+
     @IBOutlet weak var searchBtn: UIButton!
     @IBOutlet weak var tagBtn: UIButton!
     
@@ -39,8 +33,6 @@ class LibraryTableView: UIViewController {
     var searchBarHidden: Bool {
         return tableView.contentOffset.y > 0
     }
-    
-    var isTagViewHidden = true
     
     var disableBarBtns: Bool? {
         didSet {
@@ -65,7 +57,6 @@ class LibraryTableView: UIViewController {
         searchBar = UISearchBar(frame: CGRectMake(0, 0, screenHeight, 50))
         searchBar.delegate = self
         tableView.tableHeaderView = searchBar
-        print("frames: \(tagTableView.frame.origin.x), screen width: \(screenWidth)")
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -109,13 +100,6 @@ class LibraryTableView: UIViewController {
     }
     
     @IBAction func tagBtnTapped(sender: AnyObject) {
-        
-        tagTableViewRighConstraint.constant = (isTagViewHidden ? 0 : -200)
-        !isTagViewHidden
-    
-        UIView.animateWithDuration(0.5) { () -> Void in
-                self.view.layoutIfNeeded()
-        }
         
     }
     
@@ -187,58 +171,40 @@ extension LibraryTableView: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        var count = Int()
-        
-        if tableView == self.tableView {
-            count = DataManager.sharedInstance.getDataArray().count
-        } else if tableView == tagTableView {
-            count = 10
-        }
-        return count
-}
+        return DataManager.sharedInstance.getDataArray().count
+       
+    }
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        var returningCell: UITableViewCell?
-        
-        if tableView == self.tableView {
-        
-            let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! VideoCell
-            let dataArray = DataManager.sharedInstance.getDataArray()
-            let tempTuple = dataArray[indexPath.row]
-            
-            print("printing creation date: \(tempTuple.2.creationDate)")
-            let tempDict = tempTuple.0
-            
-            if let videoModel = tempDict[tempTuple.1] {
-                
-                cell.videoModel = videoModel
-                cell.videoIndentifier = videoModel.identifier
-                cell.videoLength.text = videoModel.durationString
-                cell.title.text = videoModel.title
-                cell.indexPath = indexPath
-            }
-            
-            cell.delegate = self
-            cell.videoBtn.tag = indexPath.row
-            cell.tableView = tableView
-            
-            imageManager.requestImageForAsset(tempTuple.2, targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
-                
-                if let cell = tableView.cellForRowAtIndexPath(indexPath) as? VideoCell {
-                    cell.videoBtn.setBackgroundImage(result, forState: UIControlState.Normal)
-                }
-            }
-                returningCell = cell
-            
-        } else if tableView == tagTableView {
-            
-            let cell = tableView.dequeueReusableCellWithIdentifier("tagsCell", forIndexPath: indexPath)
-            returningCell = cell
-        }
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! VideoCell
+        let dataArray = DataManager.sharedInstance.getDataArray()
+        let tempTuple = dataArray[indexPath.row]
 
-        return returningCell!
+        let tempDict = tempTuple.0
+        
+        if let videoModel = tempDict[tempTuple.1] {
+            
+            cell.videoModel = videoModel
+            cell.videoIndentifier = videoModel.identifier
+            cell.videoLength.text = videoModel.durationString
+            cell.title.text = videoModel.title
+            cell.indexPath = indexPath
+        }
+        
+        cell.delegate = self
+        cell.videoBtn.tag = indexPath.row
+        cell.tableView = tableView
+        
+        imageManager.requestImageForAsset(tempTuple.2, targetSize: CGSize(width: 100.0, height: 100.0), contentMode: .AspectFill, options: nil) { (result, _ ) in
+            
+            if let cell = tableView.cellForRowAtIndexPath(indexPath) as? VideoCell {
+                cell.videoBtn.setBackgroundImage(result, forState: UIControlState.Normal)
+            }
+        }
+        
+        return cell
     }
     
 }

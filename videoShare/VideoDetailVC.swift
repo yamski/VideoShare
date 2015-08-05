@@ -17,11 +17,19 @@ class VideoDetailVC: UIViewController {
         }
     }
     
+    @IBOutlet weak var topBar: UIView! {
+        didSet {
+            topBar.backgroundColor = UIColor(red:0.17, green:0.19, blue:0.22, alpha:1)
+        }
+    }
     var video: VideoModel!
     var asset: PHAsset!
+    var avLayer: AVPlayerLayer!
+    @IBOutlet weak var playerBackground: UIView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -31,10 +39,14 @@ class VideoDetailVC: UIViewController {
     
     func configureView() {
         
-        print("config")
-        let avLayer = AVPlayerLayer(player: player)
-        avLayer.frame = CGRectMake(0, 10, screenWidth, 200)
+        avLayer = AVPlayerLayer(player: player)
+        avLayer.frame = CGRectMake(0, 75, screenWidth, screenWidth / 1.333)
         view.layer.addSublayer(avLayer)
+    }
+    
+    
+    @IBAction func goBack(sender: AnyObject) {
+        navigationController?.popViewControllerAnimated(true)
     }
 
     override func didReceiveMemoryWarning() {
