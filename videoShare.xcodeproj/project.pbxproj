@@ -24,6 +24,7 @@
 		D0A381E41AA3B483003022C3 /* videoShareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A381E31AA3B483003022C3 /* videoShareTests.swift */; };
 		D0AD29C71B66A6B000CF4A63 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0AD29C61B66A6B000CF4A63 /* DataManager.swift */; };
 		D0E288D21B4ACF79006196DC /* AVPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E288D11B4ACF78006196DC /* AVPlayerVC.swift */; };
+		D0E8E6841B73F4270071D20D /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E8E6831B73F4270071D20D /* TagsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		D0A381E31AA3B483003022C3 /* videoShareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = videoShareTests.swift; sourceTree = "<group>"; };
 		D0AD29C61B66A6B000CF4A63 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		D0E288D11B4ACF78006196DC /* AVPlayerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerVC.swift; sourceTree = "<group>"; };
+		D0E8E6831B73F4270071D20D /* TagsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +146,7 @@
 				D0382AC71B6047A200343FCE /* LibraryTableView.swift */,
 				D08CCDF61B71336C00E50CA4 /* VideoDetailVC.swift */,
 				D0E288D11B4ACF78006196DC /* AVPlayerVC.swift */,
+				D0E8E6831B73F4270071D20D /* TagsViewController.swift */,
 			);
 			name = "view controllers";
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				D0382ACC1B6188A500343FCE /* VideoModel.swift in Sources */,
 				D0A381CE1AA3B483003022C3 /* AppDelegate.swift in Sources */,
 				D09F1D321AF7DDE8002E9549 /* CameraViewController.swift in Sources */,
+				D0E8E6841B73F4270071D20D /* TagsViewController.swift in Sources */,
 				D0382AC81B6047A200343FCE /* LibraryTableView.swift in Sources */,
 				D09F1D2E1AF40CB7002E9549 /* PreviewLayerVC.swift in Sources */,
 			);

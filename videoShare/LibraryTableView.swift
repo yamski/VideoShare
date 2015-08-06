@@ -276,4 +276,8 @@ extension LibraryTableView: VideoCellProtocol {
         }
     }
     
+    func editTags(index: Int) {
+        performSegueWithIdentifier("PresentTags", sender: self)
+    }
+    
 }

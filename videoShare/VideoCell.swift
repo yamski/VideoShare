@@ -26,6 +26,7 @@ protocol VideoCellProtocol {
     var disableBarBtns: Bool? { get set}
     func launchVideo(index: Int)
     func editInfo(index: Int)
+    func editTags(index: Int)
 }
 
 class VideoCell: UITableViewCell {
@@ -83,7 +84,7 @@ class VideoCell: UITableViewCell {
  
 
     @IBAction func addTags(sender: AnyObject) {
-
+        self.delegate?.editTags(indexPath.row)
     }
     
     

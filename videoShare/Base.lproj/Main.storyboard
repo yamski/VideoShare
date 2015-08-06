@@ -126,6 +126,110 @@
             </objects>
             <point key="canvasLocation" x="3766" y="233"/>
         </scene>
+        <!--Tags View Controller-->
+        <scene sceneID="KFE-yy-JtC">
+            <objects>
+                <viewController id="MdS-hB-3nT" customClass="TagsViewController" customModule="videoShare" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cKm-Nd-xw4"/>
+                        <viewControllerLayoutGuide type="bottom" id="rMd-kp-Z78"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="jX9-aN-fZ7">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xss-wa-B6t" customClass="tag">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="LV4-sg-pcA">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nxd-BY-pwa">
+                                            <rect key="frame" x="535" y="30" width="40" height="40"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="40" id="FAA-er-98n"/>
+                                                <constraint firstAttribute="height" constant="40" id="QIj-hh-3gL"/>
+                                            </constraints>
+                                            <state key="normal" title="Done">
+                                                <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="dismissVC:" destination="MdS-hB-3nT" eventType="touchUpInside" id="8mW-mI-1yA"/>
+                                            </connections>
+                                        </button>
+                                        <view alpha="0.65000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="53n-WC-PAW">
+                                            <rect key="frame" x="0.0" y="85" width="600" height="80"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fTn-jH-Jz0">
+                                                    <rect key="frame" x="513" y="25" width="57" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="Ec4-EI-9Fj"/>
+                                                        <constraint firstAttribute="width" constant="57" id="uv2-TD-DvD"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Add Tag">
+                                                        <color key="titleColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="addTagsPressed:" destination="MdS-hB-3nT" eventType="touchUpInside" id="glh-tw-OFp"/>
+                                                    </connections>
+                                                </button>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="neh-Zi-RKT">
+                                                    <rect key="frame" x="33" y="25" width="442" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="fLS-p4-hfh"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits"/>
+                                                </textField>
+                                            </subviews>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <constraints>
+                                                <constraint firstItem="neh-Zi-RKT" firstAttribute="leading" secondItem="53n-WC-PAW" secondAttribute="leading" constant="33" id="9lT-0z-qcy"/>
+                                                <constraint firstItem="neh-Zi-RKT" firstAttribute="centerY" secondItem="53n-WC-PAW" secondAttribute="centerY" id="DLf-dJ-Oij"/>
+                                                <constraint firstAttribute="height" constant="80" id="E2b-Zt-um8"/>
+                                                <constraint firstItem="fTn-jH-Jz0" firstAttribute="leading" secondItem="neh-Zi-RKT" secondAttribute="trailing" constant="38" id="LaI-6e-GiC"/>
+                                                <constraint firstItem="fTn-jH-Jz0" firstAttribute="centerY" secondItem="53n-WC-PAW" secondAttribute="centerY" id="UAZ-sX-DII"/>
+                                                <constraint firstAttribute="trailing" secondItem="fTn-jH-Jz0" secondAttribute="trailing" constant="30" id="UbT-xj-hLN"/>
+                                            </constraints>
+                                        </view>
+                                        <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.75" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mMP-dB-EQY">
+                                            <rect key="frame" x="0.0" y="165" width="600" height="250"/>
+                                            <color key="backgroundColor" red="0.18039215689999999" green="0.20392156859999999" blue="0.22352941179999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="250" id="ZWC-ko-7cc"/>
+                                            </constraints>
+                                        </scrollView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="53n-WC-PAW" firstAttribute="leading" secondItem="LV4-sg-pcA" secondAttribute="leading" id="87F-kW-isY"/>
+                                        <constraint firstAttribute="trailing" secondItem="nxd-BY-pwa" secondAttribute="trailing" constant="25" id="Bif-Zv-h2l"/>
+                                        <constraint firstItem="53n-WC-PAW" firstAttribute="top" secondItem="nxd-BY-pwa" secondAttribute="bottom" constant="15" id="Fh4-5u-WCH"/>
+                                        <constraint firstItem="mMP-dB-EQY" firstAttribute="leading" secondItem="LV4-sg-pcA" secondAttribute="leading" id="Iqk-Sj-BOw"/>
+                                        <constraint firstAttribute="trailing" secondItem="mMP-dB-EQY" secondAttribute="trailing" id="JIH-vH-gyp"/>
+                                        <constraint firstItem="mMP-dB-EQY" firstAttribute="top" secondItem="53n-WC-PAW" secondAttribute="bottom" id="lhK-Es-my9"/>
+                                        <constraint firstAttribute="trailing" secondItem="53n-WC-PAW" secondAttribute="trailing" id="xRa-iy-aGc"/>
+                                        <constraint firstItem="nxd-BY-pwa" firstAttribute="top" secondItem="LV4-sg-pcA" secondAttribute="top" constant="30" id="zKo-e0-jqL"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="light"/>
+                            </visualEffectView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="xss-wa-B6t" firstAttribute="top" secondItem="jX9-aN-fZ7" secondAttribute="top" id="2OD-5F-HM9"/>
+                            <constraint firstItem="rMd-kp-Z78" firstAttribute="top" secondItem="xss-wa-B6t" secondAttribute="bottom" id="KXE-pP-oi3"/>
+                            <constraint firstAttribute="trailing" secondItem="xss-wa-B6t" secondAttribute="trailing" id="aXz-TD-b3K"/>
+                            <constraint firstItem="xss-wa-B6t" firstAttribute="leading" secondItem="jX9-aN-fZ7" secondAttribute="leading" id="bE6-15-yiz"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="scrollView" destination="mMP-dB-EQY" id="Ys8-O9-W24"/>
+                        <outlet property="tagTextField" destination="neh-Zi-RKT" id="n16-c2-dII"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UQy-qU-rXI" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5353" y="-454"/>
+        </scene>
         <!--Library Table View-->
         <scene sceneID="KzS-x4-1w7">
             <objects>
@@ -217,7 +321,7 @@
                                                     </connections>
                                                 </button>
                                             </subviews>
-                                            <color key="backgroundColor" red="1" green="0.80000000000000004" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                             <constraints>
                                                 <constraint firstItem="WmH-r0-NvP" firstAttribute="top" secondItem="HtC-vN-NXb" secondAttribute="top" id="MXt-r1-Xss"/>
                                                 <constraint firstItem="IRB-wQ-KeZ" firstAttribute="leading" secondItem="WmH-r0-NvP" secondAttribute="trailing" constant="20" id="Ojb-lz-NKA"/>
@@ -320,11 +424,12 @@
                         <outlet property="tagBtn" destination="mdx-M5-4TB" id="tIs-XC-qf4"/>
                         <segue destination="VSa-AS-46b" kind="show" identifier="VideoPlayer" id="Ltm-eT-jYX"/>
                         <segue destination="kty-JS-tag" kind="show" identifier="VideoDetails" id="18a-5C-dsI"/>
+                        <segue destination="MdS-hB-3nT" kind="presentation" identifier="PresentTags" id="IVC-9a-U8Z"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Kr2-eV-0Gm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5355" y="233"/>
+            <point key="canvasLocation" x="5353" y="233"/>
         </scene>
         <!--AV Player View Controller-->
         <scene sceneID="LJE-Zs-w5m">
@@ -395,6 +500,7 @@
                             <constraint firstItem="zsl-aW-cxC" firstAttribute="top" secondItem="b0z-jO-Id7" secondAttribute="bottom" id="yJh-oY-deF"/>
                         </constraints>
                     </view>
+                    <value key="contentSizeForViewInPopover" type="size" width="600" height="600"/>
                     <keyCommands>
                         <keyCommand/>
                     </keyCommands>
@@ -410,7 +516,6 @@
         <!--Nav Controller-->
         <scene sceneID="vTK-jx-LzF">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="uPY-Ch-XRs" customClass="NavController" customModule="videoShare" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -423,6 +528,7 @@
                         <segue destination="8d9-wf-fyB" kind="relationship" relationship="rootViewController" id="POl-Hg-z1T"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4633" y="233"/>
         </scene>
