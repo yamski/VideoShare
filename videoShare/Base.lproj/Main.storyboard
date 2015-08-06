@@ -141,7 +141,6 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="WbC-dK-xcW">
                                 <rect key="frame" x="0.0" y="75" width="600" height="525"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <color key="sectionIndexBackgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="1UX-yg-29f" customClass="VideoCell" customModule="videoShare" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="22" width="600" height="100"/>
@@ -218,6 +217,7 @@
                                                     </connections>
                                                 </button>
                                             </subviews>
+                                            <color key="backgroundColor" red="1" green="0.80000000000000004" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstItem="WmH-r0-NvP" firstAttribute="top" secondItem="HtC-vN-NXb" secondAttribute="top" id="MXt-r1-Xss"/>
                                                 <constraint firstItem="IRB-wQ-KeZ" firstAttribute="leading" secondItem="WmH-r0-NvP" secondAttribute="trailing" constant="20" id="Ojb-lz-NKA"/>
@@ -292,7 +292,7 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="WbC-dK-xcW" secondAttribute="trailing" id="5B4-ki-frp"/>
                             <constraint firstItem="WbC-dK-xcW" firstAttribute="top" secondItem="Ff2-ga-NOQ" secondAttribute="bottom" id="BJ5-3J-0nP"/>
@@ -300,15 +300,18 @@
                             <constraint firstItem="Ff2-ga-NOQ" firstAttribute="top" secondItem="8ja-5f-ZSG" secondAttribute="top" id="WKA-gB-mpF"/>
                             <constraint firstItem="Ff2-ga-NOQ" firstAttribute="leading" secondItem="8ja-5f-ZSG" secondAttribute="leading" id="fO3-sr-USh"/>
                             <constraint firstItem="WbC-dK-xcW" firstAttribute="leading" secondItem="8ja-5f-ZSG" secondAttribute="leading" id="huc-rJ-iC1"/>
+                            <constraint firstItem="WbC-dK-xcW" firstAttribute="top" secondItem="Ff2-ga-NOQ" secondAttribute="bottom" id="keQ-NC-5A7"/>
                             <constraint firstItem="WbC-dK-xcW" firstAttribute="top" secondItem="Ff2-ga-NOQ" secondAttribute="bottom" id="mQN-Se-a6v"/>
                             <constraint firstAttribute="trailing" secondItem="Ff2-ga-NOQ" secondAttribute="trailing" id="sz2-Hu-eSl"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
+                                <exclude reference="BJ5-3J-0nP"/>
                                 <exclude reference="mQN-Se-a6v"/>
                             </mask>
                         </variation>
                     </view>
+                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
                     <navigationItem key="navigationItem" id="fCM-Rf-lTZ"/>
                     <connections>
                         <outlet property="searchBtn" destination="bBn-0K-aoD" id="8GD-FR-hv8"/>
@@ -375,7 +378,7 @@
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zsl-aW-cxC">
                                 <rect key="frame" x="0.0" y="75" width="600" height="451"/>
-                                <color key="backgroundColor" red="0.71630065269999998" green="1" blue="0.6351147103" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="zsl-aW-cxC" secondAttribute="height" multiplier="600:451" id="Lyc-lR-3es"/>
                                     <constraint firstAttribute="width" constant="600" id="UG6-WI-Pzb"/>
@@ -404,12 +407,14 @@
             </objects>
             <point key="canvasLocation" x="6147" y="642"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Nav Controller-->
         <scene sceneID="vTK-jx-LzF">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="uPY-Ch-XRs" sceneMemberID="viewController">
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="uPY-Ch-XRs" customClass="NavController" customModule="videoShare" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="aPn-83-jyv">
+                    <nil key="simulatedTopBarMetrics"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="aPn-83-jyv">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -418,9 +423,8 @@
                         <segue destination="8d9-wf-fyB" kind="relationship" relationship="rootViewController" id="POl-Hg-z1T"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4543" y="233"/>
+            <point key="canvasLocation" x="4633" y="233"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="ifV-A8-uFc">

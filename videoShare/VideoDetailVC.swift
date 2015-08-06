@@ -41,6 +41,7 @@ class VideoDetailVC: UIViewController {
         
         avLayer = AVPlayerLayer(player: player)
         avLayer.frame = CGRectMake(0, 75, screenWidth, screenWidth / 1.333)
+        avLayer.videoGravity = AVLayerVideoGravityResizeAspect;
         view.layer.addSublayer(avLayer)
     }
     
@@ -48,9 +49,14 @@ class VideoDetailVC: UIViewController {
     @IBAction func goBack(sender: AnyObject) {
         navigationController?.popViewControllerAnimated(true)
     }
+    
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    
     
 }

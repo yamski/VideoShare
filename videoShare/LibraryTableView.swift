@@ -19,15 +19,10 @@ class LibraryTableView: UIViewController {
         }
     }
     
-    @IBOutlet weak var tableView: UITableView! {
-        didSet {
-            tableView.allowsSelection = true
-        }
-    }
+    @IBOutlet weak var tableView: UITableView! 
 
     @IBOutlet weak var searchBtn: UIButton!
     @IBOutlet weak var tagBtn: UIButton!
-    
     var searchBar: UISearchBar!
     
     var searchBarHidden: Bool {
@@ -43,8 +38,6 @@ class LibraryTableView: UIViewController {
 
     var imageManager = PHImageManager.defaultManager()
     var player: AVPlayer?
-    
-    
     var location: CGPoint?
     var prevLocation: CGPoint?
     
@@ -61,6 +54,7 @@ class LibraryTableView: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(false)
+        navigationController?.navigationBarHidden = true
         hideSearchBar()
     }
 
@@ -95,7 +89,7 @@ class LibraryTableView: UIViewController {
         let contentOffset = self.tableView.contentOffset;
         let height: CGFloat = CGRectGetHeight(self.tableView.tableHeaderView!.frame);
         let point = CGPoint(x: 0,y: height)
-        let newOffSet =  CGPoint(x: contentOffset.x, y: contentOffset.y + point.y)
+        let newOffSet = CGPoint(x: contentOffset.x, y: contentOffset.y + point.y)
         self.tableView.contentOffset = newOffSet;
     }
     

@@ -11,10 +11,20 @@ import UIKit
 
 class NavController: UINavigationController {
     
+    override func viewDidLoad() {
+        navigationBar.translucent = false
+        
+    }
+    
     override func shouldAutorotate() -> Bool {
         
         let topVC = self.topViewController
-        return topVC!.shouldAutorotate()
+        
+        if (topVC?.isKindOfClass(VideoDetailVC) != nil) {
+            return false
+        }
+        return true
+//        return topVC!.shouldAutorotate()
     }
     
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
