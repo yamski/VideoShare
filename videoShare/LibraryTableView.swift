@@ -97,9 +97,12 @@ class LibraryTableView: UIViewController {
         
     }
     
-    func backToCamera() {
+    
+    @IBAction func backBtnPressed(sender: AnyObject) {
         dismissViewControllerAnimated(true, completion: nil)
+        
     }
+
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent
@@ -123,11 +126,11 @@ class LibraryTableView: UIViewController {
         if let touch = touches.first {
             
             location = touch.locationInView(self.view)
-            tableViewHeader.frame = CGRectMake(0, location!.y - 10, tableViewHeader.frame.size.width, tableViewHeader.frame.size.height)
+            tableViewHeader.frame = CGRectMake(0, location!.y - 135, tableViewHeader.frame.size.width, tableViewHeader.frame.size.height)
             
             if (location!.y > 200) {
                 
-                tableViewHeader.frame = CGRectMake(0, 200, tableViewHeader.frame.size.width, tableViewHeader.frame.size.height);
+                tableViewHeader.frame = CGRectMake(0, 0, tableViewHeader.frame.size.width, tableViewHeader.frame.size.height);
             }
         }
     }
@@ -135,16 +138,16 @@ class LibraryTableView: UIViewController {
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
         if (location!.y - prevLocation!.y > 20) {
-            slideTopBarToY(200)
+            slideTopBarToY(0)
             
         } else if (location!.y - prevLocation!.y > 0 && location!.y - prevLocation!.y <= 20) {
-            slideTopBarToY(200)
+            slideTopBarToY(0)
             
         } else if (location!.y - prevLocation!.y < -20) {
-            slideTopBarToY(0)
+            slideTopBarToY(-125)
             
         } else if (location!.y - prevLocation!.y < 0 && location!.y - prevLocation!.y >= -20) {
-            slideTopBarToY(0)
+            slideTopBarToY(-125)
         }
     }
     
