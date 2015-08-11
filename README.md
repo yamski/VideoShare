@@ -7,8 +7,10 @@ Vio also accesses videos from the phones library and allows you to properly orga
 
 ## Currently working on:
 Cloud upload via Cloudkit and Dropbox.
+
 Refining tagging UI
 
 ## Future features
 Moving persistent store from NSKeyedArchiver to Core Data.
+
 Sharing videos with other users.
