@@ -525,6 +525,7 @@
         <!--Nav Controller-->
         <scene sceneID="vTK-jx-LzF">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="uPY-Ch-XRs" customClass="NavController" customModule="videoShare" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -537,43 +538,8 @@
                         <segue destination="8d9-wf-fyB" kind="relationship" relationship="rootViewController" id="POl-Hg-z1T"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="CqS-HQ-dpx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4633" y="233"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="ifV-A8-uFc">
-            <objects>
-                <viewController id="tTB-cz-gYs" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="g4w-vF-vmU"/>
-                        <viewControllerLayoutGuide type="bottom" id="4nw-mu-04f"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="NTa-Wk-RG2">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="5ir-jc-Tjq" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="CdP-in-CHy">
-            <objects>
-                <viewController id="C8t-mZ-8EA" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="0JN-rH-m7r"/>
-                        <viewControllerLayoutGuide type="bottom" id="poW-6g-i7t"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="6MP-PC-Btb">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="sSL-vR-6fg" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
+            <point key="canvasLocation" x="4541" y="217"/>
         </scene>
     </scenes>
     <resources>
